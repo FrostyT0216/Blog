@@ -1,18 +1,14 @@
 # Change baseurl before deploy
-baseurl      = "https://FrostyT0216.github.io/Blog/"
+baseurl = "https://frostyt0216.github.io/Blog/"
 languageCode = "en-us"
-title        = "Hugo Theme Stack Starter"
+title = "冰茶FrostyT's Blog"
+copyright = "FrostyT's Blog"
 
 # Theme i18n support
-# See all available values at https://github.com/CaiJimmy/hugo-theme-stack/tree/master/i18n
-defaultContentLanguage = "en"
+defaultContentLanguage = "zh"
 
 # Set hasCJKLanguage to true if DefaultContentLanguage is in [zh-cn ja ko]
-# This will make .Summary and .WordCount behave correctly for CJK languages.
-hasCJKLanguage = false
-
-# Change it to your Disqus shortname before using
-disqusShortname = "hugo-theme-stack"
+hasCJKLanguage = true
 
 [pagination]
-    pagerSize = 5
+    pagerSize = 6
