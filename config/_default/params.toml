@@ -1,4 +1,4 @@
-﻿mainSections = ["post"]
+mainSections = ["post"]
 rssFullContent = true
 favicon = "/favicon.ico"
 
