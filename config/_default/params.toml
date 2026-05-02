@@ -13,11 +13,7 @@ favicon = "/favicon.ico"
 [sidebar]
     emoji = "😝"
     subtitle = "欢迎来到我的博客喵"
-
-    [sidebar.avatar]
-        enabled = true
-        local = true
-        src = "img/avatar.png"
+    avatar = "img/avatar.ico"
 
 [article]
     math = false
