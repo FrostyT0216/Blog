@@ -15,3 +15,41 @@
     --code-font-family: 'YuWoErYanNi', monospace;
   }
 </style>
+
+<!-- 落葉效果指令碼 -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const leaves = ['🍂', '🍃', '🍁'];
+      
+      function createLeaf() {
+          const leaf = document.createElement("div");
+          leaf.className = "leaf";
+          leaf.innerText = leaves[Math.floor(Math.random() * leaves.length)];
+          
+          // 隨機初始水平位置
+          leaf.style.left = Math.random() * 100 + "vw";
+          
+          // 隨機動畫時間 (5s - 12s)
+          const duration = Math.random() * 7 + 5;
+          leaf.style.animationDuration = duration + "s";
+          
+          // 隨機大小
+          leaf.style.fontSize = Math.random() * 15 + 15 + "px";
+          
+          document.body.appendChild(leaf);
+          
+          // 自動清理
+          setTimeout(() => {
+              leaf.remove();
+          }, duration * 1000);
+      }
+      
+      // 每 800ms 產生一片樹葉
+      setInterval(createLeaf, 800);
+      
+      // 初始稍微產生一些
+      for(let i=0; i<5; i++) {
+          setTimeout(createLeaf, i * 200);
+      }
+  });
+  </script>

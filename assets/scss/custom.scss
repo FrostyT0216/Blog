@@ -18,3 +18,49 @@
     /* 程式碼字體 (通常建議保留等寬字體 monospace，視需求修改) */
     /* --code-font-family: 'MyCustomFont', monospace; */
 }
+
+// 头像旋转动画
+.sidebar header .site-avatar .site-logo {
+  transition: transform 1.65s ease-in-out; // 旋转时间
+}
+
+.sidebar header .site-avatar .site-logo:hover {
+  transform: rotate(360deg); // 旋转角度为360度
+}
+
+/* 加粗字體顏色 */
+b, strong {
+    color: #7cab86;
+}
+
+/* 落葉效果 */
+.leaf {
+    position: fixed;
+    top: -10%;
+    z-index: 10000;
+    pointer-events: none;
+    user-select: none;
+    animation: fall linear infinite;
+    font-size: 20px;
+    opacity: 0;
+}
+
+@keyframes fall {
+    0% {
+        opacity: 0;
+        top: -10%;
+        transform: translateX(0px) rotate(0deg);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        top: 100%;
+        transform: translateX(150px) rotate(360deg);
+    }
+}
+
