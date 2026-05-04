@@ -57,12 +57,50 @@
       // 初始稍微產生一些
       for(let i=0; i<5; i++) {
           setTimeout(createLeaf, i * 200);
-      }
-  });
+      }      
+      // ==========================================
+      // 鼠标点击生成 Z字形渐变毛玻璃特效（无动效）
+      // ==========================================
+      document.addEventListener("mousedown", function(e) {
+          const zBox = document.createElement("div");
+          zBox.className = "z-click-effect";
+          
+          // 随机生成大小和旋转角度
+          const size = Math.random() * 40 + 50; // 50px - 90px 大小
+          const rotate = Math.random() * 60 - 30; // -30度 到 30度 倾斜
+          
+          // 根据鼠标点击位置加上页面滚动偏移（为了 absolute 定位准确）
+          zBox.style.left = (e.pageX - size / 2) + "px";
+          zBox.style.top = (e.pageY - size / 2) + "px";
+          zBox.style.width = size + "px";
+          zBox.style.height = size + "px";
+          zBox.style.transform = `rotate(${rotate}deg)`;
+          
+          // 利用嵌套 div 提供 css毛玻璃 和 svg 提供完美边缘描边
+          zBox.innerHTML = `
+              <div class="z-glass-bg"></div>
+              <svg viewBox="0 0 100 100" class="z-glass-border" preserveAspectRatio="none">
+                  <path d="M 0 0 L 100 0 L 100 20 L 35 80 L 100 80 L 100 100 L 0 100 L 0 80 L 65 20 L 0 20 Z" />
+              </svg>
+          `;
+          
+          document.body.appendChild(zBox);
+          
+          // 为了避免无限无限制堆积导致浏览器卡顿，设置60秒后自动从DOM清理，但视觉上完全没有消失动画
+          setTimeout(() => {
+              if (zBox.parentNode) zBox.remove();
+          }, 60000);
+      });  });
   </script>
 
   <!-- 不蒜子总访问量统计 -->
   <div class="busuanzi-footer">
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+  </div>
+
+  <!-- 必应随机全屏壁纸底层 -->
+  <div class="bing-wrapper">
+    <img src="https://bing.img.run/rand.php" alt="随机获取Bing历史壁纸1080P高清" class="bing-img" />
+    <div class="bing-mask"></div>
   </div>
