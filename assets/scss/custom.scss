@@ -94,6 +94,18 @@
         display: none !important;
     }
 
+    /* 去除内部搜索输入框本体自带的白底块 */
+    input {
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    /* 去除搜索表单内可能带有的按钮背景底 */
+    button {
+        background: transparent !important;
+    }
+
     /* 悬浮强调边框手感 */
     border: 2px solid transparent !important;
     transition: border-color 0.3s ease, background-color 0.3s ease;
