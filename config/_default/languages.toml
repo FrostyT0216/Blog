@@ -5,3 +5,11 @@
 
     [zh.params]
         description = "演示说明"
+
+[zh-hant-hk]
+    languageName = "粤语"
+    title = "FrostyT's Blog"
+    weight = 2
+
+    [zh-hant-hk.params]
+        description = "演示說明"
