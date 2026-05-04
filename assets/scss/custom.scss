@@ -32,11 +32,18 @@
     text-decoration: none;
 
     /* 强制移除原有白底，应用毛玻璃背景色 #7cab86，带透明度 */
+    background: rgba(124, 171, 134, 0.15) !important;
     background-color: rgba(124, 171, 134, 0.15) !important;
     background-image: none !important; /* 清除可能存在的渐变背景 */
     box-shadow: none !important; /* 清除可能存在的卡片阴影 */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    
+    /* 清除 Stack 主题经常使用的伪元素白底或底色 */
+    &::before, &::after {
+        display: none !important;
+        background: transparent !important;
+    }
     
     /* 边框初始透明，以备 hover 时变色不引起跳动 */
     border: 2px solid transparent !important;
