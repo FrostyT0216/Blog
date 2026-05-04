@@ -63,6 +63,17 @@
     margin: 4px 0 8px 0;
 }
 
+/* 去除小卡片外层容器自带的白底，让毛玻璃按钮仿佛悬浮在网页背景上 */
+.widget.archives,
+.widget.categories,
+.widget-archive--list,
+.tagCloud-tags {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
 
 // 头像旋转动画
 .sidebar header .site-avatar .site-logo {
