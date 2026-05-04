@@ -76,6 +76,34 @@
     border: none !important;
 }
 
+/* 搜索框容器的毛玻璃特效和圆角 */
+.search-form.widget {
+    /* 毛玻璃背景和参数 */
+    background: rgba(124, 171, 134, 0.15) !important;
+    background-color: rgba(124, 171, 134, 0.15) !important;
+    background-image: none !important; /* 清除默认白色 */
+    box-shadow: none !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* 圆角设置为20px */
+    border-radius: 20px !important;
+    
+    /* 避免它和内部 input 或以前外层的伪元素冲突 */
+    &::before, &::after {
+        display: none !important;
+    }
+
+    /* 悬浮强调边框手感 */
+    border: 2px solid transparent !important;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    
+    &:hover {
+        border-color: rgba(124, 171, 134, 0.8) !important;
+        background-color: rgba(124, 171, 134, 0.25) !important;
+    }
+}
+
 
 // 头像旋转动画
 .sidebar header .site-avatar .site-logo {
