@@ -70,3 +70,27 @@ b, strong {
     }
 }
 
+/* Glassmorphism tags for categories and archives */
+.tagCloud-tags a,
+.widget-archive--list .archives-year a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(124, 171, 134, 0.5);
+    border: 1px solid rgba(124, 171, 134, 0.35);
+    color: inherit;
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tagCloud-tags a:hover,
+.widget-archive--list .archives-year a:hover {
+    background: rgba(124, 171, 134, 0.65);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+    transform: translateY(-1px);
+}
+
