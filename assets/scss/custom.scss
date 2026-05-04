@@ -33,15 +33,21 @@ b, strong {
     color: #7cab86;
 }
 
+/* 網站名稱與文章標題顏色 */
+.site-name, .site-name a, 
+.article-title, .article-title a {
+    color: #7cab86 !important;
+}
+
 /* 落葉效果 */
 .leaf {
     position: fixed;
     top: -10%;
-    z-index: 10000;
+    z-index: -1; /* 調整為 -1 讓它在背景，不會擋住文字 */
     pointer-events: none;
     user-select: none;
     animation: fall linear infinite;
-    font-size: 20px;
+    /* 移除 font-size，SVG 使用寬高控制 */
     opacity: 0;
 }
 
