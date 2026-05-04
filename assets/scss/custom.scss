@@ -19,6 +19,25 @@
     /* --code-font-family: 'MyCustomFont', monospace; */
 }
 
+/* 右侧归档和分类小卡片的毛玻璃与悬浮特效 */
+.widget.archives, 
+.widget.categories {
+    /* 毛玻璃背景色 #7cab86，带透明度 */
+    background-color: rgba(124, 171, 134, 0.15) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* 边框初始透明，以备 hover 时变色不引起跳动 */
+    border: 2px solid transparent !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    
+    /* 鼠标悬浮时边框颜色加深强调 */
+    &:hover {
+        border-color: rgba(124, 171, 134, 0.8) !important;
+    }
+}
+
+
 // 头像旋转动画
 .sidebar header .site-avatar .site-logo {
   transition: transform 1.65s ease-in-out; // 旋转时间
@@ -68,29 +87,5 @@ b, strong {
         top: 100%;
         transform: translateX(150px) rotate(360deg);
     }
-}
-
-/* Glassmorphism tags for categories and archives */
-.tagCloud-tags a,
-.widget-archive--list .archives-year a {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: rgba(124, 171, 134, 0.5);
-    border: 1px solid rgba(124, 171, 134, 0.35);
-    color: inherit;
-    backdrop-filter: blur(10px) saturate(140%);
-    -webkit-backdrop-filter: blur(10px) saturate(140%);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.tagCloud-tags a:hover,
-.widget-archive--list .archives-year a:hover {
-    background: rgba(124, 171, 134, 0.65);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
-    transform: translateY(-1px);
 }
 
