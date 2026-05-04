@@ -193,11 +193,12 @@ b, strong {
 .z-glass-bg {
     position: absolute;
     inset: 0;
-    /* 渐变绿色，选用荧光薄荷绿等较为鲜切的颜色，避开主题色 #7cab86 */
-    background: linear-gradient(135deg, rgba(0, 250, 154, 0.25), rgba(0, 200, 120, 0.1));
+    /* 渐变绿色，选用荧光薄荷绿等较为鲜亮点缀的颜色 */
+    background: linear-gradient(90deg, rgba(0, 250, 154, 0.15), rgba(0, 200, 120, 0.25), rgba(0, 250, 154, 0.15));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    clip-path: polygon(0 0, 100% 0, 100% 20%, 35% 80%, 100% 80%, 100% 100%, 0 100%, 0 80%, 65% 20%, 0 20%);
+    /* 贯穿左右的折线波浪轮廓裁切 */
+    clip-path: polygon(0 40%, 25% 60%, 50% 40%, 75% 60%, 100% 40%, 100% 60%, 75% 80%, 50% 60%, 25% 80%, 0 60%);
 }
 
 .z-glass-border {
@@ -241,8 +242,8 @@ body {
 .bing-wrapper .bing-mask {
     position: absolute;
     inset: 0;
-    /* 明亮模式：叠加 50% 的白色遮罩 */
-    background: rgba(255, 255, 255, 0.5);
+    /* 明亮模式：叠加 50% 的灰色遮罩，确保不管背景多白文字都能看清 */
+    background: rgba(128, 128, 128, 0.5);
     transition: background-color 0.5s ease;
 }
 

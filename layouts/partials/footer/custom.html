@@ -59,28 +59,30 @@
           setTimeout(createLeaf, i * 200);
       }      
       // ==========================================
-      // 鼠标点击生成 Z字形渐变毛玻璃特效（无动效）
+      // 鼠标点击生成贯穿左右的折线形状毛玻璃装饰
       // ==========================================
       document.addEventListener("mousedown", function(e) {
           const zBox = document.createElement("div");
           zBox.className = "z-click-effect";
           
-          // 随机生成大小和旋转角度
-          const size = Math.random() * 40 + 50; // 50px - 90px 大小
-          const rotate = Math.random() * 60 - 30; // -30度 到 30度 倾斜
-          
-          // 根据鼠标点击位置加上页面滚动偏移（为了 absolute 定位准确）
-          zBox.style.left = (e.pageX - size / 2) + "px";
-          zBox.style.top = (e.pageY - size / 2) + "px";
-          zBox.style.width = size + "px";
-          zBox.style.height = size + "px";
+          // 随机生成垂直位置、厚度和轻微倾斜
+          const rotate = Math.random() * 20 - 10; // -10度 到 10度 的微小倾角
+          const topPos = Math.random() * 80 + 10; // 生成在高度 10% 到 90% 范围内
+          const height = Math.random() * 60 + 80; // 厚度为 80px - 140px
+
+          // 使用 fixed 相对屏幕定位，并让其宽度稍微超出屏幕两侧确保贯穿全屏
+          zBox.style.position = "fixed";
+          zBox.style.left = "-10vw";
+          zBox.style.width = "120vw";
+          zBox.style.top = topPos + "vh";
+          zBox.style.height = height + "px";
           zBox.style.transform = `rotate(${rotate}deg)`;
           
-          // 利用嵌套 div 提供 css毛玻璃 和 svg 提供完美边缘描边
+          // 折线形的轮廓与严丝合缝的外部描边
           zBox.innerHTML = `
               <div class="z-glass-bg"></div>
               <svg viewBox="0 0 100 100" class="z-glass-border" preserveAspectRatio="none">
-                  <path d="M 0 0 L 100 0 L 100 20 L 35 80 L 100 80 L 100 100 L 0 100 L 0 80 L 65 20 L 0 20 Z" />
+                  <path d="M 0 40 L 25 60 L 50 40 L 75 60 L 100 40 L 100 60 L 75 80 L 50 60 L 25 80 L 0 60 Z" />
               </svg>
           `;
           
