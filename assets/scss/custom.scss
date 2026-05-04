@@ -20,10 +20,8 @@
 }
 
 /* 右侧归档和分类内部按钮小卡片的毛玻璃与悬浮特效 */
-.widget--archives a, 
-.widget--categories a,
-.widget.archives a, 
-.widget.categories a {
+.archives-year a, 
+.tagCloud-tags a {
     /* 排版和内边距适应独立卡片形态 */
     display: inline-flex;
     align-items: center;
@@ -33,8 +31,10 @@
     border-radius: 8px;
     text-decoration: none;
 
-    /* 毛玻璃背景色 #7cab86，带透明度 */
+    /* 强制移除原有白底，应用毛玻璃背景色 #7cab86，带透明度 */
     background-color: rgba(124, 171, 134, 0.15) !important;
+    background-image: none !important; /* 清除可能存在的渐变背景 */
+    box-shadow: none !important; /* 清除可能存在的卡片阴影 */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
@@ -50,8 +50,7 @@
 }
 
 /* 针对归档的列表按钮：支持 year 和 count 左右对齐拉开 */
-.widget--archives a,
-.widget.archives a {
+.archives-year a {
     display: flex;
     width: auto;
     margin: 4px 0 8px 0;
