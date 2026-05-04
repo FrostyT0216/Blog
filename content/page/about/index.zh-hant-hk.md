@@ -1,5 +1,5 @@
 ---
-title: 主頁
+title: 關於
 menu:
     main: 
         weight: -90
