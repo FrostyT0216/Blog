@@ -179,37 +179,7 @@ b, strong {
     pointer-events: none;
     user-select: none;
     animation: fall linear infinite;
-    /* 移除 font-size，SVG 使用寬高控制 */
     opacity: 0;
-}
-
-/* 鼠标点击生成的 Z 字形毛玻璃（位于落叶 -1 之下，所以为 -2） */
-.z-click-effect {
-    position: absolute;
-    pointer-events: none;
-    z-index: -2;
-}
-
-.z-glass-bg {
-    position: absolute;
-    inset: 0;
-    /* 渐变绿色，选用荧光薄荷绿等较为鲜亮点缀的颜色 */
-    background: linear-gradient(90deg, rgba(0, 250, 154, 0.15), rgba(0, 200, 120, 0.25), rgba(0, 250, 154, 0.15));
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    /* 贯穿左右的折线波浪轮廓裁切 */
-    clip-path: polygon(0 40%, 25% 60%, 50% 40%, 75% 60%, 100% 40%, 100% 60%, 75% 80%, 50% 60%, 25% 80%, 0 60%);
-}
-
-.z-glass-border {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    fill: none;
-    /* 明亮翡翠绿描边 */
-    stroke: rgba(0, 250, 154, 0.8);
-    stroke-width: 2px;
 }
 
 /* ================================
@@ -227,7 +197,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -10; /* 放置于绝对的最底层，排在落叶(-1)和Z字(-2)下面 */
+    z-index: -10; /* 放置于绝对的最底层，排在落叶(-1)下面 */
     pointer-events: none;
     user-select: none;
 }
@@ -242,8 +212,8 @@ body {
 .bing-wrapper .bing-mask {
     position: absolute;
     inset: 0;
-    /* 明亮模式：叠加 50% 的灰色遮罩，确保不管背景多白文字都能看清 */
-    background: rgba(128, 128, 128, 0.5);
+    /* 明亮模式：改回叠加 80% 的白色遮罩 */
+    background: rgba(255, 255, 255, 0.8);
     transition: background-color 0.5s ease;
 }
 

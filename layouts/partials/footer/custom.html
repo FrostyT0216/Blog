@@ -57,42 +57,35 @@
       // 初始稍微產生一些
       for(let i=0; i<5; i++) {
           setTimeout(createLeaf, i * 200);
-      }      
-      // ==========================================
-      // 鼠标点击生成贯穿左右的折线形状毛玻璃装饰
-      // ==========================================
-      document.addEventListener("mousedown", function(e) {
-          const zBox = document.createElement("div");
-          zBox.className = "z-click-effect";
-          
-          // 随机生成垂直位置、厚度和轻微倾斜
-          const rotate = Math.random() * 20 - 10; // -10度 到 10度 的微小倾角
-          const topPos = Math.random() * 80 + 10; // 生成在高度 10% 到 90% 范围内
-          const height = Math.random() * 60 + 80; // 厚度为 80px - 140px
+      }
+  });
 
-          // 使用 fixed 相对屏幕定位，并让其宽度稍微超出屏幕两侧确保贯穿全屏
-          zBox.style.position = "fixed";
-          zBox.style.left = "-10vw";
-          zBox.style.width = "120vw";
-          zBox.style.top = topPos + "vh";
-          zBox.style.height = height + "px";
-          zBox.style.transform = `rotate(${rotate}deg)`;
-          
-          // 折线形的轮廓与严丝合缝的外部描边
-          zBox.innerHTML = `
-              <div class="z-glass-bg"></div>
-              <svg viewBox="0 0 100 100" class="z-glass-border" preserveAspectRatio="none">
-                  <path d="M 0 40 L 25 60 L 50 40 L 75 60 L 100 40 L 100 60 L 75 80 L 50 60 L 25 80 L 0 60 Z" />
-              </svg>
-          `;
-          
-          document.body.appendChild(zBox);
-          
-          // 为了避免无限无限制堆积导致浏览器卡顿，设置60秒后自动从DOM清理，但视觉上完全没有消失动画
-          setTimeout(() => {
-              if (zBox.parentNode) zBox.remove();
-          }, 60000);
-      });  });
+  // ==========================================
+  // 壁纸持久化系统：每次访问博客访问周期内不更换图片
+  // ==========================================
+  document.addEventListener("DOMContentLoaded", function() {
+      const bingImg = document.querySelector('.bing-img');
+      if (bingImg) {
+          // 尝试从本地会话存储中获取已经缓存好的壁纸链接
+          let cachedBgUrl = sessionStorage.getItem('bing_bg_url');
+          if (cachedBgUrl) {
+              // 如果在这个会话(窗口不关)中已经有了壁纸，直接使用它
+              bingImg.src = cachedBgUrl;
+          } else {
+              // 如果没有缓存，则向 API 请求一次新的随机壁纸并截获最终真实图片地址
+              fetch("https://bing.img.run/rand.php")
+                  .then(response => {
+                      const finalUrl = response.url; // 获取重定向后的直接稳定链接
+                      sessionStorage.setItem('bing_bg_url', finalUrl); // 存入该次访问周期的存储库
+                      bingImg.src = finalUrl;
+                  })
+                  .catch(e => {
+                      // 如果跨网络抓取失败，仍回退到原本的随机 API
+                      bingImg.src = "https://bing.img.run/rand.php";
+                  });
+          }
+      }
+  });
   </script>
 
   <!-- 不蒜子总访问量统计 -->
@@ -103,6 +96,7 @@
 
   <!-- 必应随机全屏壁纸底层 -->
   <div class="bing-wrapper">
-    <img src="https://bing.img.run/rand.php" alt="随机获取Bing历史壁纸1080P高清" class="bing-img" />
+    <!-- src 交给了上面的 JS 管理，防止跳转页面时出现闪烁和刷新 -->
+    <img alt="Bing壁纸" class="bing-img" />
     <div class="bing-mask"></div>
   </div>
