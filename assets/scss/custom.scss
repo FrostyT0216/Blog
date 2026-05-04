@@ -1,3 +1,20 @@
-/*
-    You can add your own custom styles here.
-*/
+/* 定義你的自定義字體 */
+@font-face {
+    font-family: 'MyCustomFont'; /* 你自己取的字體名稱 */
+    src: url('/font/YuWoErYanNiZuiKeAi-2.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; 
+}
+
+/* 覆蓋 Stack 主題的預設字體變數 */
+:root {
+    /* 系統/介面全局字體 */
+    --sys-font-family: 'MyCustomFont', sans-serif;
+    
+    /* 文章內容字體 (如果文章需要特別指定的話) */
+    --article-font-family: 'MyCustomFont', sans-serif;
+
+    /* 程式碼字體 (通常建議保留等寬字體 monospace，視需求修改) */
+    /* --code-font-family: 'MyCustomFont', monospace; */
+}

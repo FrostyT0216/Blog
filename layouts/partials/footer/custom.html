@@ -1,0 +1,17 @@
+<style>
+  @font-face {
+    font-family: 'YuWoErYanNi';
+    src: url('{{ (resources.Get "font/YuWoErYanNiZuiKeAi-2.ttf").Permalink }}') format('truetype');
+    font-display: swap;
+  }
+
+  :root {
+    /* 兼容网上的教程，并补充 Stack 主题所需的特定变量 */
+    --base-font-family: 'YuWoErYanNi', sans-serif;
+    --sys-font-family: 'YuWoErYanNi', sans-serif;
+    --article-font-family: 'YuWoErYanNi', sans-serif;
+    
+    /* 如果您连代码块也想用这个字体，可以保留下面这行，否则建议注释掉 */
+    --code-font-family: 'YuWoErYanNi', monospace;
+  }
+</style>
