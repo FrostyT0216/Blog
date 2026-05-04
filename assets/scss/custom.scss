@@ -19,9 +19,20 @@
     /* --code-font-family: 'MyCustomFont', monospace; */
 }
 
-/* 右侧归档和分类小卡片的毛玻璃与悬浮特效 */
-.widget.archives, 
-.widget.categories {
+/* 右侧归档和分类内部按钮小卡片的毛玻璃与悬浮特效 */
+.widget--archives a, 
+.widget--categories a,
+.widget.archives a, 
+.widget.categories a {
+    /* 排版和内边距适应独立卡片形态 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin: 4px;
+    border-radius: 8px;
+    text-decoration: none;
+
     /* 毛玻璃背景色 #7cab86，带透明度 */
     background-color: rgba(124, 171, 134, 0.15) !important;
     backdrop-filter: blur(10px);
@@ -29,12 +40,21 @@
     
     /* 边框初始透明，以备 hover 时变色不引起跳动 */
     border: 2px solid transparent !important;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     
     /* 鼠标悬浮时边框颜色加深强调 */
     &:hover {
         border-color: rgba(124, 171, 134, 0.8) !important;
+        background-color: rgba(124, 171, 134, 0.25) !important;
     }
+}
+
+/* 针对归档的列表按钮：支持 year 和 count 左右对齐拉开 */
+.widget--archives a,
+.widget.archives a {
+    display: flex;
+    width: auto;
+    margin: 4px 0 8px 0;
 }
 
 
