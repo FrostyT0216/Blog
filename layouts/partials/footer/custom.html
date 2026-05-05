@@ -61,37 +61,37 @@
   });
 
   // ==========================================
-  // 壁纸持久化系统：每次访问博客访问周期内不更换图片
+  // 壁纸持久化系统：每天只更换一次壁纸
   // ==========================================
   document.addEventListener("DOMContentLoaded", function() {
       const bingImg = document.querySelector('.bing-img');
       if (bingImg) {
-          // 尝试从本地会话存储中获取已经缓存好的壁纸链接
-          let cachedBgUrl = sessionStorage.getItem('bing_bg_url');
-          if (cachedBgUrl) {
-              // 如果在这个会话(窗口不关)中已经有了壁纸，直接使用它
+          // 获取今天的日期戳作为缓存键的一部分
+          const today = new Date().toDateString();
+          let cachedVersion = localStorage.getItem('bing_bg_date');
+          let cachedBgUrl = localStorage.getItem('bing_bg_url');
+          
+          if (cachedVersion === today && cachedBgUrl) {
+              // 如果今天已经获取过壁纸，全站统一使用这个地址
               bingImg.src = cachedBgUrl;
           } else {
-              // 如果没有缓存，则向 API 请求一次新的随机壁纸并截获最终真实图片地址
-              fetch("https://bing.img.run/rand.php")
-                  .then(response => {
-                      const finalUrl = response.url; // 获取重定向后的直接稳定链接
-                      sessionStorage.setItem('bing_bg_url', finalUrl); // 存入该次访问周期的存储库
-                      bingImg.src = finalUrl;
-                  })
-                  .catch(e => {
-                      // 如果跨网络抓取失败，仍回退到原本的随机 API
-                      bingImg.src = "https://bing.img.run/rand.php";
-                  });
+              // 为了避免跨域限制，这里直接让浏览器取当天的必应壁纸 (index=0为今天)
+              // 也可以使用 index=随机数(0~7) 来在此处实现每日随机
+              const randomIdx = Math.floor(Math.random() * 8); 
+              const newUrl = `https://bing.biturl.top/?resolution=1920&format=image&index=${randomIdx}&mkt=zh-CN`;
+              
+              localStorage.setItem('bing_bg_date', today);
+              localStorage.setItem('bing_bg_url', newUrl);
+              bingImg.src = newUrl;
           }
       }
   });
   </script>
 
-  <!-- 不蒜子总访问量统计 -->
+  <!-- 不蒜子总访客数统计 (UV代替PV，基于Cookie，刷新不会疯狂增加) -->
   <div class="busuanzi-footer">
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span id="busuanzi_container_site_uv">本站总访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
   </div>
 
   <!-- 必应随机全屏壁纸底层 -->
