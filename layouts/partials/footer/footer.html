@@ -1,4 +1,22 @@
-<section class="count_info">
+<footer class="site-footer">
+    <section class="copyright" style="text-align: center; margin-bottom: 10px;">
+        &copy; 
+        {{ if eq (now.Format "2006") "2026" }}
+            2026
+        {{ else }}
+            2026 - {{ now.Format "2006" }}
+        {{ end }}
+        FrostyT's Blog
+    </section>
+
+    <section class="powerby" style="text-align: center; line-height: 1.8;">
+        兄弟你不要跟我拉扯 我告诉你 我身体里有一个孙笑川 一个户晨风还有一个体育生和做题区 哦对了 还有个吉他张<br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建<br/>
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="{{ .Site.Data.config.version }}">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+
+    <!-- 原本用户自己加的运行时间与字数统计 -->
+    <section class="count_info" style="margin-top: 10px;">
         <div>
             {{ T "footer.runtime1" }}
             <span id="ds" class="running-days"></span>
@@ -18,7 +36,8 @@
         <div>
             <span id="busuanzi_container_site_pv">{{ T "footer.pv1" }}<span id="busuanzi_value_site_pv"></span>{{ T "footer.pv2" }}</span>
         </div>
-</section>
+    </section>
+</footer>
 
 <!-- Add blog running time -->
 <script>

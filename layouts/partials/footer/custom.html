@@ -14,7 +14,56 @@
     /* 如果您连代码块也想用这个字体，可以保留下面这行，否则建议注释掉 */
     --code-font-family: 'YuWoErYanNi', monospace;
   }
+
+  /* 顶部加载提示卡片毛玻璃效果（苍绿色） */
+  .page-loading-card {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    padding: 10px 24px;
+    background: rgba(164, 201, 166, 0.4); /* 苍绿色半透明 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(164, 201, 166, 0.8);
+    border-radius: 999px; /* 大圆角 */
+    box-shadow: 0 4px 12px rgba(164, 201, 166, 0.2);
+    color: var(--sys-color-text, #333);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer; /* 提示可点击关闭 */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    animation: borderBlink 1.5s infinite alternate; /* 边框闪烁动画 */
+  }
+
+  @keyframes borderBlink {
+    0% {
+      border-color: rgba(164, 201, 166, 0.2);
+    }
+    100% {
+      border-color: rgba(164, 201, 166, 1);
+    }
+  }
+
+  /* 当深色模式生效时（配合主体的 dark mode 支持） */
+  [data-scheme="dark"] .page-loading-card {
+    background: rgba(50, 75, 55, 0.4); /* 暗一点的苍绿色 */
+    color: #eee;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 加载完毕后的消失动画类 */
+  .page-loading-card.hidden {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
 </style>
+
+<!-- 页面顶部加载提示 -->
+<div id="page-loading-card" class="page-loading-card" onclick="this.classList.add('hidden'); setTimeout(() => this.remove(), 500);">
+  🍃清风正在将落叶吹来
+</div>
 
 <!-- 落葉效果指令碼 -->
 <script>
@@ -136,6 +185,19 @@
               uvEl.innerText = bszCache.siteUv;
               if(uvContainer) uvContainer.style.display = 'inline';
           }
+      }
+  });
+  // ==========================================
+  // 页面加载提示卡片消失逻辑
+  // ==========================================
+  window.addEventListener('load', function() {
+      const loadingCard = document.getElementById('page-loading-card');
+      if (loadingCard) {
+          loadingCard.classList.add('hidden');
+          // 等待淡出和上滑的动画结束后，把 DOM 彻底删除
+          setTimeout(() => {
+              loadingCard.remove();
+          }, 500); 
       }
   });
   </script>
