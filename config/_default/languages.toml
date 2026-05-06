@@ -1,5 +1,5 @@
 [zh]
-    languageName = "简体中文"
+    label = "简体中文"
     title = "冰茶FrostyT's Blog"
     weight = 1
 
@@ -7,7 +7,7 @@
         description = "演示说明"
 
 [zh-hant-hk]
-    languageName = "粤语"
+    label = "粤语"
     title = "FrostyT's Blog"
     weight = 2
 
