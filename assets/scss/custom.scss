@@ -171,6 +171,30 @@ b, strong {
     color: #7cab86 !important;
 }
 
+/* ================================
+   左侧个人信息与导航侧边栏毛玻璃特效 
+   ================================ */
+.sidebar.left-sidebar {
+    /* 使用贯穿全站主题的 #7cab86 苍绿色毛玻璃作为左侧导航栏背景，提高透明度保持质感 */
+    background: rgba(124, 171, 134, 0.45) !important; 
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.05) !important; /* 轻微的发光阴影突出立体感 */
+    
+    /* 贴合左侧边界，右侧采用大圆角 */
+    border-radius: 0 35px 35px 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    
+    /* 去除 Stack 默认左侧可能产生的外边距（确保左侧绝对铺满） */
+    margin-left: 0 !important;
+}
+
+/* 暗黑模式下左侧导航栏的毛玻璃适配，保留苍绿色调并混合些许暗色 */
+html[data-scheme="dark"] .sidebar.left-sidebar {
+    background: rgba(124, 171, 134, 0.25) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* 落葉效果 */
 .leaf {
     position: fixed;
