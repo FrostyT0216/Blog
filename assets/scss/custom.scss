@@ -175,23 +175,38 @@ b, strong {
    左侧个人信息与导航侧边栏毛玻璃特效 
    ================================ */
 .sidebar.left-sidebar {
-    /* 使用贯穿全站主题的 #7cab86 苍绿色毛玻璃作为左侧导航栏背景，提高透明度保持质感 */
-    background: rgba(124, 171, 134, 0.45) !important; 
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    box-shadow: 2px 0 15px rgba(0,0,0,0.05) !important; /* 轻微的发光阴影突出立体感 */
+    /* 移除侧边栏本身的背景，将视觉交由伪元素无限向左延伸 */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    position: relative; /* 保证伪元素的绝对定位基于此处 */
+}
+
+/* 使用伪元素向左侧无限延展背景，以填满网页中心布局产生的留白 */
+.sidebar.left-sidebar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0; /* 右侧贴齐侧边栏原有的右边缘 */
+    width: 100vw; /* 向左无限铺满整个屏幕宽度，彻底消除左侧空隙 */
+    z-index: -1; /* 垫在文字和头像内容下方 */
     
-    /* 贴合左侧边界，右侧采用大圆角 */
-    border-radius: 0 35px 35px 0 !important;
+    /* 苍绿色毛玻璃视觉 */
+    background: rgba(124, 171, 134, 0.45); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+    
+    border-radius: 0 35px 35px 0;
     border-right: 1px solid rgba(255, 255, 255, 0.4);
-    
-    /* 去除 Stack 默认左侧可能产生的外边距（确保左侧绝对铺满） */
-    margin-left: 0 !important;
 }
 
 /* 暗黑模式下左侧导航栏的毛玻璃适配，保留苍绿色调并混合些许暗色 */
-html[data-scheme="dark"] .sidebar.left-sidebar {
-    background: rgba(124, 171, 134, 0.25) !important;
+html[data-scheme="dark"] .sidebar.left-sidebar::before {
+    background: rgba(124, 171, 134, 0.25);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
