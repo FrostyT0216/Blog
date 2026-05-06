@@ -1,0 +1,99 @@
+﻿toggleMenu = "切換選單"
+darkMode   = "深色模式"
+
+[list]
+    page       = "{{ .Count }} 個頁面"
+    section    = "章節"
+    subsection = "子章節"
+
+[article]
+    back            = "返回"
+    tableOfContents = "目錄"
+    relatedContent  = "相關文章"
+    lastUpdatedOn   = "最後更新於"
+    readingTime     = "閱讀時間：{{ .Count }} 分鐘"
+
+    [article.alert]
+        note      = "備註"
+        tip       = "提示"
+        important = "重要"
+        warning   = "警告"
+        caution   = "注意"
+
+    [article.codeblock]
+        copy   = "複製"
+        copied = "已複製！"
+
+[notFound]
+    title    = "404 錯誤"
+    subtitle = "頁面唔存在"
+
+[widget]
+    [widget.archives]
+        title = "歸檔"
+        more  = "更多"
+
+    [widget.tagCloud]
+        title = "標籤雲"
+
+    [widget.categoriesCloud]
+        title = "分類"
+
+[search]
+    title       = "搜尋"
+    placeholder = "輸入關鍵詞..."
+    resultTitle = "#PAGES_COUNT 個結果（用咗 #TIME_SECONDS 秒）"
+
+[footer]
+    builtWith  = "Built with Hugo"
+    designedBy = "主題 Stack 由 Jimmy 設計"
+
+    [footer.runtime1]
+        other = "呢個博客已穩定運行"
+    [footer.runtime2]
+        other = "日"
+    [footer.runtime3]
+        other = "小時"
+    [footer.runtime4]
+        other = "分鐘"
+
+    [footer.count1]
+        other = "共發表"
+    [footer.count2]
+        other = "篇文章 · 總計"
+    [footer.count3]
+        other = "字"
+
+    [footer.pv1]
+        other = "本站總訪問量"
+    [footer.pv2]
+        other = "次"
+
+[cookies]
+    title             = "Cookie 同意"
+    text              = "我哋用 Cookie 嚟增強你嘅瀏覽體驗，同埋分析網站流量。"
+    acceptAll         = "接受全部"
+    deny              = "拒絕"
+    managePreferences = "管理偏好設定"
+    settingsTitle     = "Cookie 偏好設定"
+    savePreferences   = "儲存偏好設定"
+    cancel            = "取消"
+    footerLink        = "Cookie 設定"
+    commentsDisabled  = "評論已停用，直到你接受功能性 Cookie。"
+
+    [cookies.necessary]
+        title = "必要"
+        text  = "呢啲 Cookie 係網站運作所必需嘅，無法停用。"
+
+    [cookies.analytics]
+        title = "分析"
+        text  = "呢啲 Cookie 幫我哋了解訪客點樣同我哋嘅網站互動。"
+
+    [cookies.functional]
+        title = "功能性"
+        text  = "呢啲 Cookie 啟用評論同嵌入內容等功能。"
+
+[pagination]
+    jumpToPage = "跳轉到頁碼"
+    jump       = "跳轉"
+    pressEnter = "撳 Enter 鍵跳轉"
