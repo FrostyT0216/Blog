@@ -250,3 +250,54 @@
     <img alt="Bing壁纸" class="bing-img" />
     <div class="bing-mask"></div>
   </div>
+
+{{ if not .IsPage }}
+<style>
+/* 随机金句置顶卡片 */
+.random-saying-card {
+    margin: 0 auto 30px auto;
+    padding: 20px 25px;
+    border-radius: 12px;
+    background: rgba(124, 171, 134, 0.15) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #7cab86;
+    box-shadow: 0 4px 15px rgba(124, 171, 134, 0.2);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.random-saying-card .saying-text {
+    font-weight: bold;
+    color: var(--sys-color-text, #333);
+    font-size: 1.15rem;
+    line-height: 1.6;
+}
+html[data-scheme="dark"] .random-saying-card {
+    background: rgba(124, 171, 134, 0.08) !important;
+    border-color: rgba(124, 171, 134, 0.5);
+}
+html[data-scheme="dark"] .random-saying-card .saying-text {
+    color: #eee;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const listContainer = document.querySelector('.article-list') || document.querySelector('.main-article') || document.querySelector('main');
+    if (listContainer) {
+        const cardHtml = `<div class="random-saying-card" id="random-saying-card" style="display: none;"><div class="saying-text" id="saying-text">获取中...</div></div>`;
+        listContainer.insertAdjacentHTML('afterbegin', cardHtml);
+        fetch('https://uapis.cn/api/v1/saying')
+            .then(response => response.json())
+            .then(data => {
+                if(data && data.text) {
+                    document.getElementById('saying-text').innerText = data.text;
+                    document.getElementById('random-saying-card').style.display = 'block';
+                }
+            })
+            .catch(console.error);
+    }
+});
+</script>
+{{ end }}
+

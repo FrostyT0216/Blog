@@ -212,7 +212,10 @@ html[data-scheme="dark"] .sidebar.left-sidebar::before {
     border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 强制让不蒜子统计的代码文字颜色跟随主题环境（明暗模式）自适应 */
+/* 强制让页脚由于自定义添加导致字色写死的统计代码跟随主题环境（明暗模式）自适应 */
+.count_info,
+.count_info div,
+.count_info span,
 .busuanzi-footer,
 #busuanzi_container_site_pv,
 #busuanzi_container_site_uv,
