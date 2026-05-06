@@ -181,7 +181,9 @@ b, strong {
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    position: relative; /* 保证伪元素的绝对定位基于此处 */
+    /* 恢复主题默认的 sticky 属性，让其在滚动时固定不动，伪元素依旧能以此为定位原点 */
+    position: sticky !important; 
+    top: 2rem !important; /* 根据需要也可以用 var(--margin) */
 }
 
 /* 使用伪元素向左侧无限延展背景，以填满网页中心布局产生的留白 */
@@ -208,6 +210,14 @@ b, strong {
 html[data-scheme="dark"] .sidebar.left-sidebar::before {
     background: rgba(124, 171, 134, 0.25);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 强制让不蒜子统计的代码文字颜色跟随主题环境（明暗模式）自适应 */
+.busuanzi-footer,
+#busuanzi_container_site_pv,
+#busuanzi_container_site_uv,
+.busuanzi-footer span {
+    color: var(--body-text-color) !important;
 }
 
 /* 落葉效果 */
