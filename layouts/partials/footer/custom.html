@@ -255,29 +255,38 @@
 <style>
 /* 随机金句置顶卡片 */
 .random-saying-card {
-    margin: 0 auto 30px auto;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 var(--section-gap, 30px) 0;
     padding: 20px 25px;
-    border-radius: 12px;
+    border-radius: var(--card-border-radius, 12px);
     background: rgba(124, 171, 134, 0.15) !important;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid #7cab86;
-    box-shadow: 0 4px 15px rgba(124, 171, 134, 0.2);
+    box-shadow: var(--shadow-sm, 0 4px 15px rgba(124, 171, 134, 0.2));
     text-align: center;
     transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+}
+.random-saying-card:hover {
+    background: rgba(124, 171, 134, 0.25) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 171, 134, 0.3);
 }
 .random-saying-card .saying-text {
     font-weight: bold;
-    color: var(--sys-color-text, #333);
-    font-size: 1.15rem;
-    line-height: 1.6;
+    color: #7cab86 !important;
+    font-size: 1.8rem; /* 与文章标题字号保持一致（由于存在响应式缩放，也可适当降低为 1.7rem） */
+    line-height: 1.5;
 }
 html[data-scheme="dark"] .random-saying-card {
     background: rgba(124, 171, 134, 0.08) !important;
     border-color: rgba(124, 171, 134, 0.5);
 }
 html[data-scheme="dark"] .random-saying-card .saying-text {
-    color: #eee;
+    color: #7cab86 !important; /* 或者使用相对亮一点的保护色 */
 }
 </style>
 
@@ -287,15 +296,31 @@ document.addEventListener("DOMContentLoaded", function() {
     if (listContainer) {
         const cardHtml = `<div class="random-saying-card" id="random-saying-card" style="display: none;"><div class="saying-text" id="saying-text">获取中...</div></div>`;
         listContainer.insertAdjacentHTML('afterbegin', cardHtml);
-        fetch('https://uapis.cn/api/v1/saying')
-            .then(response => response.json())
-            .then(data => {
-                if(data && data.text) {
-                    document.getElementById('saying-text').innerText = data.text;
-                    document.getElementById('random-saying-card').style.display = 'block';
-                }
-            })
-            .catch(console.error);
+        
+        const cardEl = document.getElementById('random-saying-card');
+        const textEl = document.getElementById('saying-text');
+        
+        const fetchSaying = () => {
+            textEl.style.opacity = '0.5'; // 点击刷新时的视觉反馈
+            fetch('https://uapis.cn/api/v1/saying')
+                .then(response => response.json())
+                .then(data => {
+                    if(data && data.text) {
+                        textEl.innerText = data.text;
+                        cardEl.style.display = 'block';
+                    }
+                })
+                .catch(console.error)
+                .finally(() => {
+                    textEl.style.opacity = '1';
+                });
+        };
+
+        // 初始获取
+        fetchSaying();
+
+        // 点击刷新
+        cardEl.addEventListener('click', fetchSaying);
     }
 });
 </script>
