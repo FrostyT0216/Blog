@@ -58,15 +58,35 @@
     opacity: 0;
     transform: translate(-50%, -20px);
   }
+  
+  .loading-counter {
+    margin-left: 12px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.8;
+  }
 </style>
 
 <!-- 页面顶部加载提示 -->
 <div id="page-loading-card" class="page-loading-card" onclick="this.classList.add('hidden'); setTimeout(() => this.remove(), 500);">
-  🍃清风正在将落叶吹来
+  <span id="loading-msg">🍃清风正在将落叶吹来</span><span id="loading-counter" class="loading-counter">0.0s</span>
 </div>
 
-<!-- 落葉效果指令碼 -->
+<!-- 落葉效果指令碼与计时器 -->
 <script>
+  // ==========================================
+  // 计时器系统
+  // ==========================================
+  let loadingTime = 0;
+  const loadingCounterEl = document.getElementById('loading-counter');
+  const loadingMsgEl = document.getElementById('loading-msg');
+  
+  const timerInterval = setInterval(() => {
+      loadingTime += 0.1;
+      if (loadingCounterEl) {
+          loadingCounterEl.innerText = loadingTime.toFixed(1) + 's';
+      }
+  }, 100);
+
   document.addEventListener("DOMContentLoaded", function() {
       // 提供不同顏色的 SVG 樹葉圖標取代原本的表情符號
       const svgLeaves = [
@@ -191,13 +211,35 @@
   // 页面加载提示卡片消失逻辑
   // ==========================================
   window.addEventListener('load', function() {
+      clearInterval(timerInterval);
+      
       const loadingCard = document.getElementById('page-loading-card');
-      if (loadingCard) {
-          loadingCard.classList.add('hidden');
-          // 等待淡出和上滑的动画结束后，把 DOM 彻底删除
+      const counterEl = document.getElementById('loading-counter');
+      const msgEl = document.getElementById('loading-msg');
+      
+      if (loadingCard && msgEl) {
+          // 停止闪烁边框，代表加载完成
+          loadingCard.style.animation = 'none';
+          loadingCard.style.borderColor = 'rgba(164, 201, 166, 0.4)';
+          
+          if(counterEl) counterEl.style.display = 'none';
+          
+          const finalTime = loadingTime.toFixed(1);
+          const quotes = [
+              `🍂 叶落，风止。清风老去了 ${finalTime} 秒，终于把这片叶送到你脚下`,
+              `🍂 这片叶，在风中辗转了 ${finalTime} 秒的尘缘，才落进你的浏览`,
+              `🍃 风寄来一封信，走了 ${finalTime} 秒的路。拆开，是一片落叶的问候`,
+              `🍂 它乘着 ${finalTime} 秒的寂静，轻轻地，落在了你正要路过的地方`
+          ];
+          msgEl.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+          
+          // 延迟 3 秒后隐藏
           setTimeout(() => {
-              loadingCard.remove();
-          }, 500); 
+              loadingCard.classList.add('hidden');
+              setTimeout(() => {
+                  loadingCard.remove();
+              }, 500); 
+          }, 3000);
       }
   });
   </script>
