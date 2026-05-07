@@ -19,13 +19,11 @@ tags:
 ## 開始之前準備
 
 正式開始之前，請確保你有以下嘅**條件**：<br>
-```
-    - 一部電腦
-        - 要裝咗 Visual Studio Code（或者其他 IDE，呢篇文用 Visual Studio Code 示範）
-        - 要裝咗 Git
-        - 要可以正常上網
-    - 一個有效嘅 Github 帳號
-```
+- 一部電腦
+    - 要裝咗 Visual Studio Code（或者其他 IDE，呢篇文用 Visual Studio Code 示範）
+    - 要裝咗 Git
+    - 要可以正常上網
+- 一個有效嘅 Github 帳號
 
 ## 關於 Hugo
 

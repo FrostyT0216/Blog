@@ -257,7 +257,7 @@
 .random-saying-card {
     width: 100%;
     box-sizing: border-box;
-    margin: 0 0 var(--section-gap, 30px) 0;
+    margin: 0 0 15px 0; /* 减小底部间距，让其和下方文章列表更紧凑 */
     padding: 20px 25px;
     border-radius: var(--card-border-radius, 12px);
     background: rgba(124, 171, 134, 0.15) !important;
@@ -325,4 +325,50 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 {{ end }}
+
+<!-- 鼠标点击水波涟漪特效 -->
+<style>
+  .click-ripple {
+    position: fixed;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+    z-index: 999999;
+    border: 2px solid rgba(164, 201, 166, 0.8); /* 苍绿色，和网站的主色调保持一致 */
+    background: rgba(164, 201, 166, 0.2);
+  }
+
+  @keyframes ripple-animation {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('click', function (e) {
+    const ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    
+    // 获取点击坐标
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    // 设置元素初始位置和大小（让圆心对应鼠标点击处）
+    const size = 30; // 波纹的基础大小
+    ripple.style.width = size + 'px';
+    ripple.style.height = size + 'px';
+    ripple.style.left = (x - size / 2) + 'px';
+    ripple.style.top = (y - size / 2) + 'px';
+    
+    document.body.appendChild(ripple);
+    
+    // 监听动画结束事件，自动清理生成的节点
+    ripple.addEventListener('animationend', () => {
+      ripple.remove();
+    });
+  });
+</script>
 
