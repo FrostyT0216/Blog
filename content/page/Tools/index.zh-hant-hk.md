@@ -21,6 +21,6 @@ links:
     image: https://cdn.json.cn/favicon.svg
   - title: 二維碼生成器
     description: 在線生成自定義二維碼，支持顏色/尺寸/透明背景
-    website: /qrcode/
+    website: https://frostyt0216.github.io/Blog/qrcode/
     image: https://api.iconify.design/tabler:qrcode.svg?color=%237cab86
 ---
