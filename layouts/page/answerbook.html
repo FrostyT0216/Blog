@@ -1,0 +1,299 @@
+{{ define "main" }}
+{{ $page := . }}
+<div class="article-container">
+    <div class="article-header" style="margin-bottom: 2rem;">
+        <h1 class="article-title">{{ $page.Title }}</h1>
+    </div>
+
+    <div class="answerbook-layout">
+        <div class="answerbook-subtitle" id="answerbook-subtitle">
+            在心中默念你的问题，然后点击书本
+        </div>
+
+        <div class="answerbook-book-wrapper">
+            <div class="answerbook-book" id="answerbook-book">
+                <div class="book-cover" id="book-cover">
+                    <div class="book-icon">📖</div>
+                    <div class="book-prompt">点击此处</div>
+                </div>
+                <div class="book-page" id="book-page">
+                    <div class="book-answer" id="book-answer"></div>
+                    <div class="book-question" id="book-question"></div>
+                    <div class="book-tap-hint">✋ 点击继续</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="answerbook-input-row">
+            <input type="text" id="answerbook-question" class="answerbook-input" placeholder="或在此输入你的问题…" />
+            <button id="answerbook-ask-btn" class="answerbook-btn">询问</button>
+        </div>
+
+        <div class="answerbook-status" id="answerbook-status"></div>
+    </div>
+</div>
+
+<style>
+.answerbook-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+}
+
+.answerbook-subtitle {
+    font-size: 1.3rem;
+    opacity: 0.75;
+    text-align: center;
+    transition: opacity 0.3s;
+    color: var(--body-text-color);
+}
+
+/* 书本容器 */
+.answerbook-book-wrapper {
+    perspective: 1200px;
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 5 / 7;
+}
+
+.answerbook-book {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d;
+}
+
+.answerbook-book.flipped {
+    transform: rotateY(-180deg);
+}
+
+/* 封面 */
+.book-cover,
+.book-page {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.book-cover {
+    background: linear-gradient(145deg, #5a9c6a, #7cab86);
+    color: #fff;
+    z-index: 2;
+}
+
+.book-cover .book-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: floatBook 3s ease-in-out infinite;
+}
+
+@keyframes floatBook {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.book-cover .book-prompt {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* 内页 */
+.book-page {
+    background: var(--card-background, #fff);
+    transform: rotateY(180deg);
+    border: 2px solid var(--card-border-color, #e0e0e0);
+    overflow-y: auto;
+}
+
+.book-answer {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--body-text-color);
+    margin-bottom: 1rem;
+    min-height: 3.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.book-question {
+    font-size: 1rem;
+    opacity: 0.55;
+    text-align: center;
+    color: var(--body-text-color);
+    margin-bottom: 0.5rem;
+    padding: 0 0.5rem;
+    word-break: break-all;
+}
+
+.book-tap-hint {
+    font-size: 0.85rem;
+    opacity: 0.4;
+    margin-top: auto;
+    color: var(--body-text-color);
+}
+
+/* 自定义输入行 */
+.answerbook-input-row {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.answerbook-input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--card-border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--card-background, #fff);
+    color: var(--body-text-color);
+    transition: border-color 0.2s;
+}
+
+.answerbook-input:focus {
+    outline: none;
+    border-color: #7cab86;
+    box-shadow: 0 0 0 2px rgba(124, 171, 134, 0.2);
+}
+
+.answerbook-btn {
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, #7cab86, #5a9c6a);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+}
+
+.answerbook-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 171, 134, 0.4);
+}
+
+.answerbook-btn:active {
+    transform: translateY(0);
+}
+
+.answerbook-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.answerbook-status {
+    font-size: 0.9rem;
+    opacity: 0.6;
+    min-height: 1.4rem;
+    text-align: center;
+    color: var(--body-text-color);
+}
+
+.answerbook-status.error {
+    color: #e74c3c;
+    opacity: 1;
+}
+</style>
+
+<script>
+(function() {
+    const API_URL = 'https://uapis.cn/api/v1/answerbook/ask?question=';
+
+    const book = document.getElementById('answerbook-book');
+    const cover = document.getElementById('book-cover');
+    const page = document.getElementById('book-page');
+    const answerEl = document.getElementById('book-answer');
+    const questionEl = document.getElementById('book-question');
+    const subtitle = document.getElementById('answerbook-subtitle');
+    const statusEl = document.getElementById('answerbook-status');
+    const input = document.getElementById('answerbook-question');
+    const askBtn = document.getElementById('answerbook-ask-btn');
+
+    let isLoading = false;
+
+    function fetchAnswer(question) {
+        if (isLoading) return;
+        isLoading = true;
+        statusEl.textContent = '翻开书中…';
+        statusEl.className = 'answerbook-status';
+        askBtn.disabled = true;
+
+        fetch(API_URL + encodeURIComponent(question))
+            .then(r => {
+                if (!r.ok) throw new Error('请求失败 (' + r.status + ')');
+                return r.json();
+            })
+            .then(data => {
+                if (data && data.answer) {
+                    answerEl.textContent = data.answer;
+                    questionEl.textContent = '—— 「' + (data.question || question) + '」';
+                    book.classList.add('flipped');
+                    subtitle.style.opacity = '0.3';
+                    statusEl.textContent = '';
+                } else {
+                    throw new Error('返回数据异常');
+                }
+            })
+            .catch(err => {
+                statusEl.textContent = '出错了: ' + err.message;
+                statusEl.className = 'answerbook-status error';
+            })
+            .finally(() => {
+                isLoading = false;
+                askBtn.disabled = false;
+            });
+    }
+
+    // 点击书本
+    book.addEventListener('click', function(e) {
+        if (e.target.closest('.book-page')) {
+            // 点击内页 = 翻回封面
+            book.classList.remove('flipped');
+            subtitle.style.opacity = '0.75';
+            return;
+        }
+        if (book.classList.contains('flipped')) return;
+        // 点击封面
+        const question = input.value.trim() || '今天我会开心吗';
+        fetchAnswer(question);
+    });
+
+    // 询问按钮
+    askBtn.addEventListener('click', function() {
+        const question = input.value.trim() || '今天我会开心吗';
+        book.classList.remove('flipped');
+        setTimeout(() => fetchAnswer(question), 400);
+    });
+
+    // 回车键
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            askBtn.click();
+        }
+    });
+})();
+</script>
+{{ end }}
