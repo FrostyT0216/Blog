@@ -14,20 +14,10 @@
                     <textarea id="qrcode-text" rows="3" placeholder="输入网址、文字、联系方式…">https://www.bilibili.com/video/BV1uT4y1P7CX/</textarea>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="qrcode-size">尺寸 (px)</label>
-                        <input type="number" id="qrcode-size" value="256" min="256" max="2048" step="1" />
-                        <span class="form-hint">256 ~ 2048</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="qrcode-format">返回格式</label>
-                        <select id="qrcode-format">
-                            <option value="image">image (直接图片)</option>
-                            <option value="json" selected>json (Base64)</option>
-                            <option value="json_url">json_url (临时URL)</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="qrcode-size">尺寸 (px)</label>
+                    <input type="number" id="qrcode-size" value="256" min="100" max="1024" step="1" />
+                    <span class="form-hint">100 ~ 1024</span>
                 </div>
 
                 <div class="form-row">
@@ -75,7 +65,7 @@
     </div>
 
     <div class="qrcode-info">
-        <p>API 来源: <a href="https://uapis.cn/docs/api-reference/get-image-qrcode" target="_blank">uapis.cn 二维码接口</a></p>
+        <p>纯浏览器端生成，无需服务器，数据不会上传</p>
     </div>
 </div>
 
@@ -282,13 +272,12 @@
 }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const apiKey = 'uapi-mu3v20bqYcYNTKpMgs5uiLuDr9Px6k0cJW2W8C7_';
-
     const textInput = document.getElementById('qrcode-text');
     const sizeInput = document.getElementById('qrcode-size');
-    const formatSelect = document.getElementById('qrcode-format');
     const fgcolorInput = document.getElementById('qrcode-fgcolor');
     const bgcolorInput = document.getElementById('qrcode-bgcolor');
     const transparentCheck = document.getElementById('qrcode-transparent');
@@ -298,17 +287,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadLink = document.getElementById('qrcode-download');
     const copyBtn = document.getElementById('qrcode-copy');
 
+    let currentQR = null;
+
     // 透明背景时禁用背景色选择
     transparentCheck.addEventListener('change', function() {
         bgcolorInput.disabled = this.checked;
-        if (this.checked) {
-            bgcolorInput.style.opacity = '0.4';
-        } else {
-            bgcolorInput.style.opacity = '1';
-        }
+        bgcolorInput.style.opacity = this.checked ? '0.4' : '1';
     });
 
-    generateBtn.addEventListener('click', function() {
+    function generateQR() {
         const text = textInput.value.trim();
         if (!text) {
             alert('请输入要编码的文本内容');
@@ -316,96 +303,68 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // 构建参数
-        const params = new URLSearchParams();
-        params.set('text', text);
-        params.set('size', sizeInput.value || '256');
-        params.set('format', formatSelect.value);
-        if (transparentCheck.checked) {
-            params.set('transparent', 'true');
-        } else {
-            // 前景色/背景色需要将 # 编码为 %23
-            params.set('fgcolor', fgcolorInput.value);
-            params.set('bgcolor', bgcolorInput.value);
-        }
+        const size = parseInt(sizeInput.value) || 256;
+        const fgColor = fgcolorInput.value;
+        const bgColor = transparentCheck.checked ? 'rgba(0,0,0,0)' : bgcolorInput.value;
 
-        const url = `https://uapis.cn/api/v1/image/qrcode?${params.toString()}`;
+        // 清空并生成新的二维码（纯 canvas 绘制）
+        resultDiv.innerHTML = '';
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        resultDiv.appendChild(canvas);
 
-        // 显示加载状态
-        resultDiv.innerHTML = '<div class="preview-placeholder" style="opacity:0.6;"><p>生成中…</p></div>';
-        actionsDiv.style.display = 'none';
-
-        fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${apiKey}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || '请求失败'); });
-            }
-
-            const format = formatSelect.value;
-
-            if (format === 'image') {
-                // 直接返回图片二进制
-                return response.blob().then(blob => {
-                    const imgUrl = URL.createObjectURL(blob);
-                    resultDiv.innerHTML = `<img src="${imgUrl}" alt="QR Code" />`;
-                    downloadLink.href = imgUrl;
-                    actionsDiv.style.display = 'flex';
-                    // 复制功能: 需要重新获取 base64
-                    copyBtn.dataset.blobUrl = imgUrl;
-                });
-            } else {
-                // json 或 json_url
-                return response.json().then(data => {
-                    if (data && data.url) {
-                        const imgUrl = data.url;
-                        resultDiv.innerHTML = `<img src="${imgUrl}" alt="QR Code" />`;
-                        if (format === 'json_url') {
-                            // 临时公网URL 可直接下载
-                            downloadLink.href = imgUrl;
-                        } else {
-                            // Base64 Data URI
-                            downloadLink.href = imgUrl;
-                        }
-                        actionsDiv.style.display = 'flex';
-                    } else {
-                        throw new Error('接口返回格式异常');
-                    }
-                });
-            }
-        })
-        .catch(error => {
-            resultDiv.innerHTML = `<div class="preview-placeholder" style="opacity:0.6;"><p style="color:#e74c3c;">生成失败: ${error.message}</p></div>`;
-            actionsDiv.style.display = 'none';
+        currentQR = new QRCode(canvas, {
+            text: text,
+            width: size,
+            height: size,
+            colorDark: fgColor,
+            colorLight: bgColor,
+            correctLevel: QRCode.CorrectLevel.H
         });
+
+        actionsDiv.style.display = 'flex';
+
+        // 更新下载链接
+        setTimeout(() => {
+            const imgData = canvas.toDataURL('image/png');
+            downloadLink.href = imgData;
+        }, 100);
+    }
+
+    generateBtn.addEventListener('click', generateQR);
+
+    // 回车键快速生成
+    textInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            generateQR();
+        }
     });
 
     // 复制到剪贴板
     copyBtn.addEventListener('click', function() {
-        const img = resultDiv.querySelector('img');
-        if (!img) return;
+        const canvas = resultDiv.querySelector('canvas');
+        if (!canvas) return;
 
-        // 尝试使用 Clipboard API
-        fetch(img.src)
-            .then(res => res.blob())
-            .then(blob => {
-                navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
-                ]).then(() => {
-                    const orig = copyBtn.textContent;
-                    copyBtn.textContent = '已复制 ✓';
-                    setTimeout(() => copyBtn.textContent = orig, 2000);
-                }).catch(() => {
-                    // 降级：复制图片地址
-                    navigator.clipboard.writeText(img.src).then(() => {
-                        alert('图片地址已复制到剪贴板');
-                    });
+        canvas.toBlob(function(blob) {
+            navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': blob })
+            ]).then(() => {
+                const orig = copyBtn.textContent;
+                copyBtn.textContent = '已复制 ✓';
+                setTimeout(() => copyBtn.textContent = orig, 2000);
+            }).catch(() => {
+                // 降级：复制图片地址
+                navigator.clipboard.writeText(downloadLink.href).then(() => {
+                    alert('图片地址已复制到剪贴板');
                 });
             });
+        });
     });
+
+    // 自动生成默认文本的二维码
+    setTimeout(generateQR, 300);
 });
 </script>
 {{ end }}
