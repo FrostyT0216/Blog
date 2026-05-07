@@ -1,0 +1,22 @@
+---
+title: "在線工具"
+layout: "links"
+menu:
+    main:
+        weight: 55
+        params:
+            icon: terminal-2
+links:
+  - title: DeepSeek
+    description: 強大嘅 AI 對話助手與推理模型
+    website: https://chat.deepseek.com/
+    image: https://chat.deepseek.com/favicon.ico
+  - title: GitHub Copilot
+    description: AI 賦能程式碼補全與智能編程
+    website: https://github.com/features/copilot
+    image: https://github.githubassets.com/favicons/favicon-dark.svg
+  - title: JSON 在線解析
+    description: 在線嘅 JSON 編輯、格式化同校驗工具
+    website: https://www.json.cn/
+    image: https://www.json.cn/favicon.ico
+---
