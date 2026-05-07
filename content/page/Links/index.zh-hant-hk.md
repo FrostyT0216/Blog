@@ -1,5 +1,5 @@
 ---
-title: "連結"
+title: "Links"
 layout: "links"
 menu:
     main:

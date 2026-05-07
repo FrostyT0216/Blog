@@ -231,7 +231,14 @@
               `🍃 风寄来一封信，走了 ${finalTime} 秒的路。拆开，是一片落叶的问候`,
               `🍂 它乘着 ${finalTime} 秒的寂静，轻轻地，落在了你正要路过的地方`
           ];
-          msgEl.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+          let finalQuote = quotes[Math.floor(Math.random() * quotes.length)];
+          {{ if eq .Site.Language.Lang "zh-hant-hk" }}
+          if (window.OpenCC) {
+              const converter = window.OpenCC.Converter({ from: 'cn', to: 'hk' });
+              finalQuote = converter(finalQuote);
+          }
+          {{ end }}
+          msgEl.innerText = finalQuote;
           
           // 延迟 3 秒后隐藏
           setTimeout(() => {
@@ -290,23 +297,35 @@ html[data-scheme="dark"] .random-saying-card .saying-text {
 }
 </style>
 
+{{ if eq .Site.Language.Lang "zh-hant-hk" }}
+<script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+{{ end }}
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const listContainer = document.querySelector('.article-list') || document.querySelector('.main-article') || document.querySelector('main');
     if (listContainer) {
-        const cardHtml = `<div class="random-saying-card" id="random-saying-card" style="display: none;"><div class="saying-text" id="saying-text">获取中...</div></div>`;
+        const loadingText = "{{ if eq .Site.Language.Lang "zh-hant-hk" }}獲取中...{{ else }}获取中...{{ end }}";
+        const cardHtml = `<div class="random-saying-card" id="random-saying-card" style="display: none;"><div class="saying-text" id="saying-text">${loadingText}</div></div>`;
         listContainer.insertAdjacentHTML('afterbegin', cardHtml);
         
         const cardEl = document.getElementById('random-saying-card');
         const textEl = document.getElementById('saying-text');
-        
+
         const fetchSaying = () => {
             textEl.style.opacity = '0.5'; // 点击刷新时的视觉反馈
             fetch('https://uapis.cn/api/v1/saying')
                 .then(response => response.json())
                 .then(data => {
                     if(data && data.text) {
-                        textEl.innerText = data.text;
+                        let sayingText = data.text;
+                        {{ if eq .Site.Language.Lang "zh-hant-hk" }}
+                        if (window.OpenCC) {
+                            const converter = window.OpenCC.Converter({ from: 'cn', to: 'hk' });
+                            sayingText = converter(sayingText);
+                        }
+                        {{ end }}
+                        textEl.innerText = sayingText;
                         cardEl.style.display = 'block';
                     }
                 })

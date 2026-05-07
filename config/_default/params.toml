@@ -33,7 +33,8 @@ favicon = "/favicon.ico"
         { type = "search" },
         { type = "archives", params = { limit = 5 } },
         { type = "categories", params = { limit = 10 } },
-        { type = "tag-cloud", params = { limit = 10 } }
+        { type = "tag-cloud", params = { limit = 10 } },
+        { type = "netease" }
     ]
     page = [
         { type = "toc" }

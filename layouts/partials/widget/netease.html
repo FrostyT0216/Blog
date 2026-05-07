@@ -1,0 +1,168 @@
+<section class="widget netease-hot">
+    <h2 class="widget-title section-title">🎧 网易热歌</h2>
+    <div class="netease-card glassmorphism" id="netease-card">
+        <a id="netease-link" href="#" target="_blank" class="netease-link">
+            <div class="netease-content">
+                <img id="netease-pic" class="netease-pic" src="" alt="封面" style="display: none;" />
+                <div class="netease-info">
+                    <div id="netease-title" class="netease-title">加载中...</div>
+                    <div id="netease-author" class="netease-author">请稍候</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<style>
+/* 毛玻璃样式 (Glassmorphism) */
+.netease-card {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+    transition: transform 0.3s, background 0.3s;
+    padding: 12px;
+}
+
+[data-scheme="dark"] .netease-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.netease-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+[data-scheme="dark"] .netease-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.netease-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.netease-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.netease-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.netease-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    flex: 1;
+}
+
+.netease-title {
+    font-size: 1rem;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+    color: var(--body-text-color);
+}
+
+.netease-author {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--body-text-color);
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('https://uapis.cn/api/v1/misc/hotboard?type=netease-music', {
+        headers: {
+            'Authorization': 'Bearer uapi-mu3v20bqYcYNTKpMgs5uiLuDr9Px6k0cJW2W8C7_'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        let list = [];
+        if (data && data.data && Array.isArray(data.data)) {
+            list = data.data;
+        } else if (data && data.list && Array.isArray(data.list)) {
+            list = data.list;
+        } else if (Array.isArray(data)) {
+            list = data;
+        } else if (data && data.data && data.data.list && Array.isArray(data.data.list)) {
+            list = data.data.list;
+        } else if (data && data.data && data.data.tracks && Array.isArray(data.data.tracks)) {
+            list = data.data.tracks;
+        }
+        
+        if (list && list.length > 0) {
+            // 获取榜单第一首歌
+            const song = list[0];
+            
+            const name = song.name || song.title || "未知歌名";
+            
+            let author = "未知歌手";
+            let album = "";
+            if (song.author) author = song.author;
+            else if (song.ar && song.ar.length > 0) author = song.ar.map(a => a.name).join('/');
+            else if (song.singer) author = song.singer;
+            else if (song.artist) author = song.artist;
+            else if (song.artists) author = song.artists;
+            
+            if (song.al && song.al.name) album = song.al.name;
+            else if (song.album) album = song.album;
+            else if (song.albumName) album = song.albumName;
+            
+            const pic = song.picUrl || song.cover || song.pic || song.image || (song.al && song.al.picUrl) || "";
+            
+            // 跳转地址：如果有链接则用它的，否则使用网易云默认拼接 ID 方式
+            let url = song.url || song.link;
+            if (!url) {
+                if (song.id) {
+                    url = `https://music.163.com/#/song?id=${song.id}`;
+                } else {
+                    url = 'https://music.163.com/';
+                }
+            }
+            
+            document.getElementById('netease-title').textContent = name;
+            let subText = author;
+            if (album) subText += " - " + album;
+            document.getElementById('netease-author').textContent = subText;
+            
+            const imgEl = document.getElementById('netease-pic');
+            if (pic) {
+                imgEl.src = pic;
+                imgEl.style.display = 'block';
+            }
+            document.getElementById('netease-link').href = url;
+            
+        } else {
+            document.getElementById('netease-title').textContent = "暂无数据";
+            document.getElementById('netease-author').textContent = "-";
+        }
+    })
+    .catch(error => {
+        console.error('获取网易云热榜失败:', error);
+        document.getElementById('netease-title').textContent = "加载失败";
+        document.getElementById('netease-author').textContent = "请检查网络或API状态";
+    });
+});
+</script>
