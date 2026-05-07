@@ -10,8 +10,8 @@
             <line x1="9" y1="8" x2="19" y2="8"></line>
         </svg>
     </div>
-    <h2 class="widget-title section-title">�����Ƽ�</h2>
-    <div class="widget--netease">
+    <h2 class="widget-title section-title">歌曲推荐</h2>
+    <div class="widget--netease glassmorphism-card">
         <a href="{{ $song.link | default '#' }}" target="_blank" class="netease-link">
             <div class="netease-content">
                 <img class="netease-pic" src="{{ $song.cover }}" alt="封面" />
@@ -30,9 +30,22 @@
 </section>
 
 <style>
-/* ����������һ�µ��ڲ����� */
-.widget--netease {
-    padding: 5px 0;
+/* 还原毛玻璃样式 */
+.glassmorphism-card {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 12px;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+[data-scheme="dark"] .glassmorphism-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .netease-link {
@@ -40,13 +53,13 @@
     color: inherit;
     display: block;
     border-radius: 8px;
-    transition: background-color 0.3s;
-    padding: 8px;
-    margin-bottom: 8px;
+    padding: 6px;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .netease-link:hover {
     background-color: var(--card-background-selected, rgba(0, 0, 0, 0.03));
+    transform: translateY(-2px);
 }
 
 [data-scheme="dark"] .netease-link:hover {
@@ -95,21 +108,22 @@
     color: var(--body-text-color);
 }
 
+/* 绿色点评主题 */
 .netease-comment {
     padding: 10px 12px;
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: rgba(16, 185, 129, 0.1);
     border-radius: 8px;
     font-size: 0.9rem;
     color: var(--body-text-color);
     opacity: 0.9;
-    border-left: 4px solid #f85656;
+    border-left: 4px solid #10b981; /* 绿色左边框 */
     line-height: 1.5;
-    margin: 0 4px;
+    margin: 8px 4px 4px 4px;
 }
 
 [data-scheme="dark"] .netease-comment {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-left-color: #d33a31;
+    background-color: rgba(16, 185, 129, 0.15);
+    border-left-color: #059669; /* 深色模式下颜色微调 */
 }
 
 .netease-comment p {
