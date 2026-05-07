@@ -1,6 +1,6 @@
 {{ if site.Data.song }}
 {{ $song := site.Data.song }}
-<section class="widget netease-hot">
+<section class="widget netease-hot archives">
     <div class="widget-icon">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-music" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -11,13 +11,13 @@
         </svg>
     </div>
     <h2 class="widget-title section-title">歌曲推荐</h2>
-    <div class="widget--netease glassmorphism-card">
+    <div class="widget--netease">
         <a href="{{ $song.link | default '#' }}" target="_blank" class="netease-link">
             <div class="netease-content">
                 <img class="netease-pic" src="{{ $song.cover }}" alt="封面" />
                 <div class="netease-info">
-                    <div class="netease-title">{{ $song.title }}{{ if $song.album }} - {{ $song.album }}{{ end }}</div>
-                    <div class="netease-author">{{ $song.author }}</div>
+                    <div class="netease-title-text">{{ $song.title }}{{ if $song.album }} - {{ $song.album }}{{ end }}</div>
+                    <div class="netease-author-text">{{ $song.author }}</div>
                 </div>
             </div>
         </a>
@@ -30,40 +30,40 @@
 </section>
 
 <style>
-/* 还原毛玻璃样式 */
-.glassmorphism-card {
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 12px;
-    margin-top: 10px;
-    transition: background 0.3s;
+/* 匹配你自定义的归档/标签云毛玻璃样式。
+这里通过对 a 标签及其容器应用你的统一 rgba(124, 171, 134) 色系毛玻璃。
+通过给外层 section 添加 archives class 从而去除默认白底。*/
+
+.widget--netease {
+    padding: 2px 0;
 }
 
-[data-scheme="dark"] .glassmorphism-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.netease-link, .netease-comment {
+    /* 与你的 custom.scss 中的 .archives-year a 统一参数 */
+    display: block;
+    margin: 4px;
+    border-radius: 8px;
+    text-decoration: none;
+    
+    background: rgba(124, 171, 134, 0.15) !important;
+    background-color: rgba(124, 171, 134, 0.15) !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    border: 2px solid transparent !important;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover 特效对齐你的归档 */
+.netease-link:hover {
+    border-color: rgba(124, 171, 134, 0.8) !important;
+    background-color: rgba(124, 171, 134, 0.25) !important;
 }
 
 .netease-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    border-radius: 8px;
-    padding: 6px;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.netease-link:hover {
-    background-color: var(--card-background-selected, rgba(0, 0, 0, 0.03));
-    transform: translateY(-2px);
-}
-
-[data-scheme="dark"] .netease-link:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
 }
 
 .netease-content {
@@ -78,7 +78,6 @@
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .netease-info {
@@ -89,7 +88,7 @@
     flex: 1;
 }
 
-.netease-title {
+.netease-title-text {
     font-size: 1.1rem;
     font-weight: bold;
     white-space: nowrap;
@@ -99,7 +98,7 @@
     color: var(--body-text-color);
 }
 
-.netease-author {
+.netease-author-text {
     font-size: 0.95rem;
     opacity: 0.8;
     white-space: nowrap;
@@ -108,22 +107,13 @@
     color: var(--body-text-color);
 }
 
-/* 绿色点评主题 */
 .netease-comment {
     padding: 10px 12px;
-    background-color: rgba(16, 185, 129, 0.1);
-    border-radius: 8px;
     font-size: 0.9rem;
     color: var(--body-text-color);
     opacity: 0.9;
-    border-left: 4px solid #10b981; /* 绿色左边框 */
+    /* 取消单独的左边框，回归整体卡片风格 */
     line-height: 1.5;
-    margin: 8px 4px 4px 4px;
-}
-
-[data-scheme="dark"] .netease-comment {
-    background-color: rgba(16, 185, 129, 0.15);
-    border-left-color: #059669; /* 深色模式下颜色微调 */
 }
 
 .netease-comment p {
