@@ -21,6 +21,6 @@ links:
     image: https://cdn.json.cn/favicon.svg
   - title: 二维码生成器
     description: 在线生成自定义二维码，支持颜色/尺寸/透明背景
-    website: /page/tools/qrcode/
+    website: /qrcode/
     image: https://api.iconify.design/tabler:qrcode.svg?color=%237cab86
 ---
