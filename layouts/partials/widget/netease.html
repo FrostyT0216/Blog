@@ -1,50 +1,50 @@
 <section class="widget netease-hot">
-    <h2 class="widget-title section-title">🎧 网易热歌</h2>
-    <div class="netease-card glassmorphism" id="netease-card">
-        <a id="netease-link" href="#" target="_blank" class="netease-link">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-music" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <circle cx="6" cy="17" r="3"></circle>
+            <circle cx="16" cy="17" r="3"></circle>
+            <polyline points="9 17 9 4 19 4 19 17"></polyline>
+            <line x1="9" y1="8" x2="19" y2="8"></line>
+        </svg>
+    </div>
+    <h2 class="widget-title section-title">网易云音乐</h2>
+    <div class="widget--netease">
+        <a id="netease-link" href="#" target="_blank" class="netease-link" style="display: none;">
             <div class="netease-content">
-                <img id="netease-pic" class="netease-pic" src="" alt="封面" style="display: none;" />
+                <img id="netease-pic" class="netease-pic" src="" alt="封面" />
                 <div class="netease-info">
                     <div id="netease-title" class="netease-title">加载中...</div>
                     <div id="netease-author" class="netease-author">请稍候</div>
                 </div>
             </div>
         </a>
+        <div id="netease-error" style="text-align: center; color: var(--body-text-color); font-size: 0.9rem; padding: 10px 0;">
+            加载中...
+        </div>
     </div>
 </section>
 
 <style>
-/* 毛玻璃样式 (Glassmorphism) */
-.netease-card {
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    overflow: hidden;
-    transition: transform 0.3s, background 0.3s;
-    padding: 12px;
-}
-
-[data-scheme="dark"] .netease-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.netease-card:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.5);
-}
-
-[data-scheme="dark"] .netease-card:hover {
-    background: rgba(255, 255, 255, 0.1);
+/* 保持与主题一致的内部布局，不再强制附加多余白底，以继承外层widget样式 */
+.widget--netease {
+    padding: 10px 0;
 }
 
 .netease-link {
     text-decoration: none;
     color: inherit;
     display: block;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.netease-link:hover {
+    background-color: var(--card-background-selected, rgba(0, 0, 0, 0.05));
+}
+
+[data-scheme="dark"] .netease-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .netease-content {
@@ -92,77 +92,66 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // 替换为你在 uapis.cn 获取的对应 API Key （如果你更换了请在这里更新）
+    const apiKey = 'uapi-mu3v20bqYcYNTKpMgs5uiLuDr9Px6k0cJW2W8C7_';
+
     fetch('https://uapis.cn/api/v1/misc/hotboard?type=netease-music', {
+        method: 'GET',
         headers: {
-            'Authorization': 'Bearer uapi-mu3v20bqYcYNTKpMgs5uiLuDr9Px6k0cJW2W8C7_'
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        let list = [];
-        if (data && data.data && Array.isArray(data.data)) {
-            list = data.data;
-        } else if (data && data.list && Array.isArray(data.list)) {
-            list = data.list;
-        } else if (Array.isArray(data)) {
-            list = data;
-        } else if (data && data.data && data.data.list && Array.isArray(data.data.list)) {
-            list = data.data.list;
-        } else if (data && data.data && data.data.tracks && Array.isArray(data.data.tracks)) {
-            list = data.data.tracks;
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: 请检查 API Key 权限或存在跨域问题`);
         }
+        return response.json();
+    })
+    .then(res => {
+        let list = [];
         
+        // 兼容 uapis 常见的返回结构
+        if (res.data && res.data.list) {
+            list = res.data.list;
+        } else if (res.data && Array.isArray(res.data)) {
+            list = res.data;
+        } else if (res.list && Array.isArray(res.list)) {
+            list = res.list;
+        } else if (Array.isArray(res)) {
+            list = res;
+        }
+
         if (list && list.length > 0) {
-            // 获取榜单第一首歌
-            const song = list[0];
+            const song = list[0]; // 只需要第一首歌
             
+            // 针对接口可能的字段做全面兼容
             const name = song.name || song.title || "未知歌名";
+            let author = song.author || song.artist || "未知歌手";
+            if (song.ar && song.ar.length > 0) author = song.ar.map(a => a.name).join('/');
             
-            let author = "未知歌手";
-            let album = "";
-            if (song.author) author = song.author;
-            else if (song.ar && song.ar.length > 0) author = song.ar.map(a => a.name).join('/');
-            else if (song.singer) author = song.singer;
-            else if (song.artist) author = song.artist;
-            else if (song.artists) author = song.artists;
-            
-            if (song.al && song.al.name) album = song.al.name;
-            else if (song.album) album = song.album;
-            else if (song.albumName) album = song.albumName;
-            
-            const pic = song.picUrl || song.cover || song.pic || song.image || (song.al && song.al.picUrl) || "";
-            
-            // 跳转地址：如果有链接则用它的，否则使用网易云默认拼接 ID 方式
-            let url = song.url || song.link;
-            if (!url) {
-                if (song.id) {
-                    url = `https://music.163.com/#/song?id=${song.id}`;
-                } else {
-                    url = 'https://music.163.com/';
-                }
-            }
+            const pic = song.pic || song.cover || song.picUrl || (song.al && song.al.picUrl) || "";
+            const url = song.url || song.link || `https://music.163.com/#/song?id=${song.id || ''}`;
             
             document.getElementById('netease-title').textContent = name;
-            let subText = author;
-            if (album) subText += " - " + album;
-            document.getElementById('netease-author').textContent = subText;
-            
-            const imgEl = document.getElementById('netease-pic');
+            document.getElementById('netease-author').textContent = author;
             if (pic) {
-                imgEl.src = pic;
-                imgEl.style.display = 'block';
+                document.getElementById('netease-pic').src = pic;
             }
             document.getElementById('netease-link').href = url;
             
+            document.getElementById('netease-link').style.display = 'block';
+            document.getElementById('netease-error').style.display = 'none';
         } else {
-            document.getElementById('netease-title').textContent = "暂无数据";
-            document.getElementById('netease-author').textContent = "-";
+            throw new Error("接口未返回内容或无法遍历数据结构");
         }
     })
     .catch(error => {
-        console.error('获取网易云热榜失败:', error);
-        document.getElementById('netease-title').textContent = "加载失败";
-        document.getElementById('netease-author').textContent = "请检查网络或API状态";
+        console.error('API Error:', error);
+        const errEl = document.getElementById('netease-error');
+        errEl.textContent = '无法获取榜单数据: ' + error.message;
+        errEl.style.display = 'block';
+        document.getElementById('netease-link').style.display = 'none';
     });
 });
 </script>
