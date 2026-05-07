@@ -71,17 +71,17 @@
 }
 
 .netease-title {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     color: var(--body-text-color);
 }
 
 .netease-author {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     opacity: 0.8;
     white-space: nowrap;
     overflow: hidden;
@@ -127,13 +127,22 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // 针对接口可能的字段做全面兼容
             const name = song.name || song.title || "未知歌名";
+            
+            let album = "";
+            if (song.al && song.al.name) album = song.al.name;
+            else if (song.album) album = typeof song.album === 'string' ? song.album : (song.album.name || "");
+            
+            let displayTitle = name;
+            if (album) displayTitle += ` - ${album}`;
+
             let author = song.author || song.artist || "未知歌手";
-            if (song.ar && song.ar.length > 0) author = song.ar.map(a => a.name).join('/');
+            if (song.ar && song.ar.length > 0) author = song.ar.map(a => a.name).join(' / ');
+            else if (song.singer) author = song.singer;
             
             const pic = song.pic || song.cover || song.picUrl || (song.al && song.al.picUrl) || "";
             const url = song.url || song.link || `https://music.163.com/#/song?id=${song.id || ''}`;
             
-            document.getElementById('netease-title').textContent = name;
+            document.getElementById('netease-title').textContent = displayTitle;
             document.getElementById('netease-author').textContent = author;
             if (pic) {
                 document.getElementById('netease-pic').src = pic;
