@@ -1,0 +1,411 @@
+{{ define "body" }}
+{{ $page := . }}
+<div class="article-container">
+    <div class="article-header" style="margin-bottom: 2rem;">
+        <h1 class="article-title">{{ $page.Title }}</h1>
+    </div>
+
+    <div class="qrcode-layout">
+        <!-- 左侧：参数面板 -->
+        <div class="qrcode-panel">
+            <div class="qrcode-form">
+                <div class="form-group">
+                    <label for="qrcode-text">文本内容 *</label>
+                    <textarea id="qrcode-text" rows="3" placeholder="输入网址、文字、联系方式…">https://www.bilibili.com/video/BV1uT4y1P7CX/</textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="qrcode-size">尺寸 (px)</label>
+                        <input type="number" id="qrcode-size" value="256" min="256" max="2048" step="1" />
+                        <span class="form-hint">256 ~ 2048</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="qrcode-format">返回格式</label>
+                        <select id="qrcode-format">
+                            <option value="image">image (直接图片)</option>
+                            <option value="json" selected>json (Base64)</option>
+                            <option value="json_url">json_url (临时URL)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="qrcode-fgcolor">前景色</label>
+                        <input type="color" id="qrcode-fgcolor" value="#000000" />
+                    </div>
+                    <div class="form-group">
+                        <label for="qrcode-bgcolor">背景色</label>
+                        <input type="color" id="qrcode-bgcolor" value="#ffffff" />
+                    </div>
+                </div>
+
+                <div class="form-group form-checkbox">
+                    <label>
+                        <input type="checkbox" id="qrcode-transparent" />
+                        透明背景（勾选后背景色设置无效）
+                    </label>
+                </div>
+
+                <button id="qrcode-generate" class="btn btn-primary">生成二维码</button>
+            </div>
+        </div>
+
+        <!-- 右侧：预览区 -->
+        <div class="qrcode-preview">
+            <div class="preview-card" id="qrcode-result">
+                <div class="preview-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <rect x="4" y="4" width="6" height="6" rx="1"/>
+                        <rect x="14" y="4" width="6" height="6" rx="1"/>
+                        <rect x="4" y="14" width="6" height="6" rx="1"/>
+                        <path d="M14 17l1 1l3 -3"/>
+                        <rect x="17" y="14" width="3" height="3" rx="1"/>
+                    </svg>
+                    <p>配置参数后点击生成</p>
+                </div>
+            </div>
+            <div class="preview-actions" id="qrcode-actions" style="display:none;">
+                <a id="qrcode-download" class="btn btn-secondary" download="qrcode.png">下载图片</a>
+                <button id="qrcode-copy" class="btn btn-secondary">复制到剪贴板</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="qrcode-info">
+        <p>API 来源: <a href="https://uapis.cn/docs/api-reference/get-image-qrcode" target="_blank">uapis.cn 二维码接口</a></p>
+    </div>
+</div>
+
+<style>
+.qrcode-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .qrcode-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 左侧参数面板 */
+.qrcode-panel {
+    background: var(--card-background, #fff);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.qrcode-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--body-text-color);
+}
+
+.form-group textarea,
+.form-group input[type="number"],
+.form-group select {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--card-border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--card-background, #fff);
+    color: var(--body-text-color);
+    transition: border-color 0.2s;
+}
+
+.form-group textarea:focus,
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #7cab86;
+    box-shadow: 0 0 0 2px rgba(124, 171, 134, 0.2);
+}
+
+.form-group input[type="color"] {
+    width: 100%;
+    height: 40px;
+    padding: 2px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.form-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #7cab86;
+}
+
+/* 生成按钮 */
+#qrcode-generate {
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, #7cab86, #5a9c6a);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 0.5rem;
+}
+
+#qrcode-generate:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 171, 134, 0.4);
+}
+
+#qrcode-generate:active {
+    transform: translateY(0);
+}
+
+/* 右侧预览区 */
+.qrcode-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.preview-card {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1 / 1;
+    background: var(--card-background, #fff);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.preview-card img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.preview-card .preview-placeholder {
+    text-align: center;
+    opacity: 0.4;
+}
+
+.preview-card .preview-placeholder svg {
+    margin-bottom: 0.5rem;
+}
+
+.preview-card .preview-placeholder p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* 操作按钮 */
+.btn {
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.2s;
+}
+
+.btn-secondary {
+    background: var(--card-background-selected, rgba(0,0,0,0.05));
+    color: var(--body-text-color);
+    border: 1px solid var(--card-border-color, #e0e0e0);
+}
+
+.btn-secondary:hover {
+    opacity: 0.8;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 底部信息 */
+.qrcode-info {
+    text-align: center;
+    opacity: 0.5;
+    font-size: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.qrcode-info a {
+    color: var(--body-text-color);
+    text-decoration: underline;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const apiKey = 'uapi-mu3v20bqYcYNTKpMgs5uiLuDr9Px6k0cJW2W8C7_';
+
+    const textInput = document.getElementById('qrcode-text');
+    const sizeInput = document.getElementById('qrcode-size');
+    const formatSelect = document.getElementById('qrcode-format');
+    const fgcolorInput = document.getElementById('qrcode-fgcolor');
+    const bgcolorInput = document.getElementById('qrcode-bgcolor');
+    const transparentCheck = document.getElementById('qrcode-transparent');
+    const generateBtn = document.getElementById('qrcode-generate');
+    const resultDiv = document.getElementById('qrcode-result');
+    const actionsDiv = document.getElementById('qrcode-actions');
+    const downloadLink = document.getElementById('qrcode-download');
+    const copyBtn = document.getElementById('qrcode-copy');
+
+    // 透明背景时禁用背景色选择
+    transparentCheck.addEventListener('change', function() {
+        bgcolorInput.disabled = this.checked;
+        if (this.checked) {
+            bgcolorInput.style.opacity = '0.4';
+        } else {
+            bgcolorInput.style.opacity = '1';
+        }
+    });
+
+    generateBtn.addEventListener('click', function() {
+        const text = textInput.value.trim();
+        if (!text) {
+            alert('请输入要编码的文本内容');
+            textInput.focus();
+            return;
+        }
+
+        // 构建参数
+        const params = new URLSearchParams();
+        params.set('text', text);
+        params.set('size', sizeInput.value || '256');
+        params.set('format', formatSelect.value);
+        if (transparentCheck.checked) {
+            params.set('transparent', 'true');
+        } else {
+            // 前景色/背景色需要将 # 编码为 %23
+            params.set('fgcolor', fgcolorInput.value);
+            params.set('bgcolor', bgcolorInput.value);
+        }
+
+        const url = `https://uapis.cn/api/v1/image/qrcode?${params.toString()}`;
+
+        // 显示加载状态
+        resultDiv.innerHTML = '<div class="preview-placeholder" style="opacity:0.6;"><p>生成中…</p></div>';
+        actionsDiv.style.display = 'none';
+
+        fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || '请求失败'); });
+            }
+
+            const format = formatSelect.value;
+
+            if (format === 'image') {
+                // 直接返回图片二进制
+                return response.blob().then(blob => {
+                    const imgUrl = URL.createObjectURL(blob);
+                    resultDiv.innerHTML = `<img src="${imgUrl}" alt="QR Code" />`;
+                    downloadLink.href = imgUrl;
+                    actionsDiv.style.display = 'flex';
+                    // 复制功能: 需要重新获取 base64
+                    copyBtn.dataset.blobUrl = imgUrl;
+                });
+            } else {
+                // json 或 json_url
+                return response.json().then(data => {
+                    if (data && data.url) {
+                        const imgUrl = data.url;
+                        resultDiv.innerHTML = `<img src="${imgUrl}" alt="QR Code" />`;
+                        if (format === 'json_url') {
+                            // 临时公网URL 可直接下载
+                            downloadLink.href = imgUrl;
+                        } else {
+                            // Base64 Data URI
+                            downloadLink.href = imgUrl;
+                        }
+                        actionsDiv.style.display = 'flex';
+                    } else {
+                        throw new Error('接口返回格式异常');
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            resultDiv.innerHTML = `<div class="preview-placeholder" style="opacity:0.6;"><p style="color:#e74c3c;">生成失败: ${error.message}</p></div>`;
+            actionsDiv.style.display = 'none';
+        });
+    });
+
+    // 复制到剪贴板
+    copyBtn.addEventListener('click', function() {
+        const img = resultDiv.querySelector('img');
+        if (!img) return;
+
+        // 尝试使用 Clipboard API
+        fetch(img.src)
+            .then(res => res.blob())
+            .then(blob => {
+                navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]).then(() => {
+                    const orig = copyBtn.textContent;
+                    copyBtn.textContent = '已复制 ✓';
+                    setTimeout(() => copyBtn.textContent = orig, 2000);
+                }).catch(() => {
+                    // 降级：复制图片地址
+                    navigator.clipboard.writeText(img.src).then(() => {
+                        alert('图片地址已复制到剪贴板');
+                    });
+                });
+            });
+    });
+});
+</script>
+{{ end }}
