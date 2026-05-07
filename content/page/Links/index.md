@@ -14,13 +14,13 @@ links:
   - title: Hugo
     description: 全球最快的网站构建框架
     website: https://gohugo.io/
-    image: https://gohugo.io/favicon.ico
+    image: https://gohugo.io/favicon-32x32.png
   - title: Stack 主题
     description: Hugo 的卡片式博客主题
     website: https://stack.cai.im/
-    image: https://stack.cai.im/favicon.ico
+    image: https://stack.cai.im/favicon-32x32.png
   - title: Bing 搜索
     description: 微软必应搜索引擎
     website: https://www.bing.com/
-    image: https://www.bing.com/favicon.ico
+    image: https://www.bing.com/sa/simg/favicon-trans-bg-blue-mg-pn.png
 ---
