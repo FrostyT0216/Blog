@@ -356,8 +356,10 @@
         [20,45,15,61,46,16]
     ];
 
+    var EC_TABLE_INDEX = [1, 0, 3, 2];
+
     function getRSBlocks(typeNumber, errorCorrectLevel) {
-        var rsBlock = RS_BLOCK_TABLE[(typeNumber - 1) * 4 + errorCorrectLevel];
+        var rsBlock = RS_BLOCK_TABLE[(typeNumber - 1) * 4 + EC_TABLE_INDEX[errorCorrectLevel]];
         if (!rsBlock) throw new Error('bad rs block');
         var length = rsBlock.length / 3;
         var list = [];
@@ -858,7 +860,7 @@
 
     function getTypeNumber(dataLength, errorCorrectLevel) {
         for (var typeNumber = 1; typeNumber <= 40; typeNumber++) {
-            var limit = QR_CODE_LIMIT_LENGTH[typeNumber - 1][errorCorrectLevel];
+            var limit = QR_CODE_LIMIT_LENGTH[typeNumber - 1][EC_TABLE_INDEX[errorCorrectLevel]];
             if (dataLength <= limit) return typeNumber;
         }
         throw new Error('Data too long');
