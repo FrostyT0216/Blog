@@ -15,7 +15,7 @@
 
                 <div class="form-group">
                     <label for="qrcode-size">尺寸 (px)</label>
-                    <input type="number" id="qrcode-size" value="256" min="100" max="1024" step="1" />
+                    <input type="number" id="qrcode-size" value="400" min="100" max="1024" step="1" />
                     <span class="form-hint">100 ~ 1024</span>
                 </div>
 
@@ -197,7 +197,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow: visible;
     position: relative;
 }
 
@@ -205,6 +205,7 @@
     max-width: 100%;
     max-height: 100%;
     display: block;
+    image-rendering: pixelated;
 }
 
 .preview-card .preview-placeholder {
@@ -943,23 +944,26 @@
                 return;
             }
 
-            var size = parseInt(sizeInput.value) || 256;
+            var size = parseInt(sizeInput.value) || 400;
             var fgColor = fgcolorInput.value;
             var bgColor = transparentCheck.checked ? 'rgba(0,0,0,0)' : bgcolorInput.value;
 
             resultDiv.innerHTML = '';
-            var canvas = document.createElement('canvas');
-            resultDiv.appendChild(canvas);
 
             try {
                 var qr = makeQRCode(text, EC_LEVEL_MAP['H']);
+                var canvas = document.createElement('canvas');
                 drawQRToCanvas(qr, canvas, {
                     width: size,
                     margin: 4,
                     color: { dark: fgColor, light: bgColor }
                 });
-                actionsDiv.style.display = 'flex';
                 var imgData = canvas.toDataURL('image/png');
+                var img = document.createElement('img');
+                img.src = imgData;
+                img.alt = 'QR Code';
+                resultDiv.appendChild(img);
+                actionsDiv.style.display = 'flex';
                 downloadLink.href = imgData;
             } catch (e) {
                 console.error('二维码生成失败:', e);
@@ -978,29 +982,30 @@
         });
 
         copyBtn.addEventListener('click', function() {
-            var canvas = resultDiv.querySelector('canvas');
-            if (!canvas) return;
+            var img = resultDiv.querySelector('img');
+            if (!img) return;
 
-            canvas.toBlob(function(blob) {
-                if (navigator.clipboard && window.ClipboardItem) {
-                    navigator.clipboard.write([
-                        new ClipboardItem({ 'image/png': blob })
-                    ]).then(function() {
-                        var orig = copyBtn.textContent;
-                        copyBtn.textContent = '已复制 ✓';
-                        setTimeout(function() { copyBtn.textContent = orig; }, 2000);
-                    }).catch(function() {
-                        fallbackCopy(canvas);
-                    });
-                } else {
-                    fallbackCopy(canvas);
-                }
-            });
+            fetch(img.src)
+                .then(function(res) { return res.blob(); })
+                .then(function(blob) {
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]).then(function() {
+                            var orig = copyBtn.textContent;
+                            copyBtn.textContent = '已复制 ✓';
+                            setTimeout(function() { copyBtn.textContent = orig; }, 2000);
+                        }).catch(function() {
+                            fallbackCopy(img);
+                        });
+                    } else {
+                        fallbackCopy(img);
+                    }
+                });
         });
 
-        function fallbackCopy(canvas) {
-            var imgData = canvas.toDataURL('image/png');
-            navigator.clipboard.writeText(imgData).then(function() {
+        function fallbackCopy(img) {
+            navigator.clipboard.writeText(img.src).then(function() {
                 alert('图片数据已复制到剪贴板');
             }).catch(function() {
                 alert('复制失败，请使用下载功能');
