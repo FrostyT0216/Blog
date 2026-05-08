@@ -865,13 +865,15 @@
 
     function getUTF8ByteLength(text) {
         var len = 0;
+        var hasNonAscii = false;
         for (var i = 0; i < text.length; i++) {
             var code = text.charCodeAt(i);
-            if (code > 0x10000) len += 4;
-            else if (code > 0x800) len += 3;
-            else if (code > 0x80) len += 2;
+            if (code > 0x10000) { len += 4; hasNonAscii = true; }
+            else if (code > 0x800) { len += 3; hasNonAscii = true; }
+            else if (code > 0x80) { len += 2; hasNonAscii = true; }
             else len += 1;
         }
+        if (hasNonAscii) len += 3;
         return len;
     }
 
@@ -887,10 +889,10 @@
     function drawQRToCanvas(qr, canvas, options) {
         var moduleCount = qr.getModuleCount();
         var size = options.width || 256;
-        var margin = options.margin || 2;
+        var margin = options.margin || 4;
         var fgColor = (options.color && options.color.dark) || '#000000';
         var bgColor = (options.color && options.color.light) || '#ffffff';
-        var cellSize = Math.floor((size - 2 * margin) / moduleCount);
+        var cellSize = Math.floor(size / (moduleCount + 2 * margin));
         var offset = Math.floor((size - cellSize * moduleCount) / 2);
 
         canvas.width = size;
@@ -953,7 +955,7 @@
                 var qr = makeQRCode(text, EC_LEVEL_MAP['H']);
                 drawQRToCanvas(qr, canvas, {
                     width: size,
-                    margin: 2,
+                    margin: 4,
                     color: { dark: fgColor, light: bgColor }
                 });
                 actionsDiv.style.display = 'flex';
