@@ -104,7 +104,7 @@
 }
 
 .form-group label {
-    font-size: 0.9rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--body-text-color);
 }
@@ -112,10 +112,10 @@
 .form-group textarea,
 .form-group input[type="number"],
 .form-group select {
-    padding: 0.6rem 0.8rem;
+    padding: 0.8rem 1rem;
     border: 1px solid var(--card-border-color, #e0e0e0);
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     background: var(--card-background, #fff);
     color: var(--body-text-color);
     transition: border-color 0.2s;
@@ -138,7 +138,7 @@
 }
 
 .form-hint {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     opacity: 0.6;
 }
 
@@ -154,6 +154,7 @@
     gap: 0.5rem;
     cursor: pointer;
     font-weight: 400;
+    font-size: 1.05rem;
 }
 
 .form-checkbox input[type="checkbox"] {
@@ -164,12 +165,12 @@
 
 /* 生成按钮 */
 #qrcode-generate {
-    padding: 0.7rem 1.5rem;
+    padding: 0.9rem 2rem;
     background: linear-gradient(135deg, #7cab86, #5a9c6a);
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -225,14 +226,14 @@
 
 .preview-card .preview-placeholder p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
 }
 
 /* 操作按钮 */
 .btn {
-    padding: 0.5rem 1.2rem;
+    padding: 0.6rem 1.4rem;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     font-weight: 500;
     cursor: pointer;
     border: none;
@@ -262,7 +263,7 @@
 .qrcode-info {
     text-align: center;
     opacity: 0.5;
-    font-size: 0.8rem;
+    font-size: 1rem;
     margin-top: 1.5rem;
 }
 
@@ -272,8 +273,7 @@
 }
 </style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const textInput = document.getElementById('qrcode-text');
@@ -286,8 +286,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const actionsDiv = document.getElementById('qrcode-actions');
     const downloadLink = document.getElementById('qrcode-download');
     const copyBtn = document.getElementById('qrcode-copy');
-
-    let currentQR = null;
 
     // 透明背景时禁用背景色选择
     transparentCheck.addEventListener('change', function() {
@@ -314,22 +312,28 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.height = size;
         resultDiv.appendChild(canvas);
 
-        currentQR = new QRCode(canvas, {
-            text: text,
+        QRCode.toCanvas(canvas, text, {
             width: size,
-            height: size,
-            colorDark: fgColor,
-            colorLight: bgColor,
-            correctLevel: QRCode.CorrectLevel.H
-        });
+            margin: 2,
+            color: {
+                dark: fgColor,
+                light: bgColor
+            },
+            errorCorrectionLevel: 'H'
+        }, function(error) {
+            if (error) {
+                console.error('二维码生成失败:', error);
+                resultDiv.innerHTML = '<div class="preview-placeholder"><p style="color:#e74c3c">生成失败，请检查内容</p></div>';
+                actionsDiv.style.display = 'none';
+                return;
+            }
 
-        actionsDiv.style.display = 'flex';
+            actionsDiv.style.display = 'flex';
 
-        // 更新下载链接
-        setTimeout(() => {
+            // 更新下载链接
             const imgData = canvas.toDataURL('image/png');
             downloadLink.href = imgData;
-        }, 100);
+        });
     }
 
     generateBtn.addEventListener('click', generateQR);
@@ -348,23 +352,33 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!canvas) return;
 
         canvas.toBlob(function(blob) {
-            navigator.clipboard.write([
-                new ClipboardItem({ 'image/png': blob })
-            ]).then(() => {
-                const orig = copyBtn.textContent;
-                copyBtn.textContent = '已复制 ✓';
-                setTimeout(() => copyBtn.textContent = orig, 2000);
-            }).catch(() => {
-                // 降级：复制图片地址
-                navigator.clipboard.writeText(downloadLink.href).then(() => {
-                    alert('图片地址已复制到剪贴板');
+            if (navigator.clipboard && window.ClipboardItem) {
+                navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]).then(() => {
+                    const orig = copyBtn.textContent;
+                    copyBtn.textContent = '已复制 ✓';
+                    setTimeout(() => copyBtn.textContent = orig, 2000);
+                }).catch(() => {
+                    fallbackCopy(canvas);
                 });
-            });
+            } else {
+                fallbackCopy(canvas);
+            }
         });
     });
 
+    function fallbackCopy(canvas) {
+        const imgData = canvas.toDataURL('image/png');
+        navigator.clipboard.writeText(imgData).then(() => {
+            alert('图片数据已复制到剪贴板');
+        }).catch(() => {
+            alert('复制失败，请使用下载功能');
+        });
+    }
+
     // 自动生成默认文本的二维码
-    setTimeout(generateQR, 300);
+    setTimeout(generateQR, 500);
 });
 </script>
 {{ end }}
