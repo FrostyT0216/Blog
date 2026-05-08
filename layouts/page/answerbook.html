@@ -72,7 +72,7 @@
     transform: rotateY(-180deg);
 }
 
-/* 封面 */
+/* 封面 & 内页 — 毛玻璃效果 */
 .book-cover,
 .book-page {
     position: absolute;
@@ -86,10 +86,20 @@
     justify-content: center;
     padding: 3rem 2rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    background: rgba(124, 171, 134, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-cover:hover,
+.book-page:hover {
+    border-color: rgba(124, 171, 134, 0.8);
+    background-color: rgba(124, 171, 134, 0.25);
 }
 
 .book-cover {
-    background: linear-gradient(145deg, #5a9c6a, #7cab86);
     color: #fff;
     z-index: 2;
 }
@@ -113,9 +123,7 @@
 
 /* 内页 */
 .book-page {
-    background: var(--card-background, #fff);
     transform: rotateY(180deg);
-    border: 2px solid var(--card-border-color, #e0e0e0);
     overflow-y: auto;
 }
 
@@ -160,36 +168,41 @@
 .answerbook-input {
     flex: 1;
     padding: 1.2rem 1.5rem;
-    border: 2px solid var(--card-border-color, #e0e0e0);
+    border: 2px solid transparent;
     border-radius: 12px;
     font-size: 2rem;
-    background: var(--card-background, #fff);
+    background: rgba(124, 171, 134, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: var(--body-text-color);
-    transition: border-color 0.2s;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .answerbook-input:focus {
     outline: none;
-    border-color: #7cab86;
-    box-shadow: 0 0 0 3px rgba(124, 171, 134, 0.2);
+    border-color: rgba(124, 171, 134, 0.8);
+    background-color: rgba(124, 171, 134, 0.25);
 }
 
 .answerbook-btn {
     padding: 1.2rem 2.5rem;
-    background: linear-gradient(135deg, #7cab86, #5a9c6a);
-    color: #fff;
-    border: none;
+    background: rgba(124, 171, 134, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--body-text-color);
+    border: 2px solid transparent;
     border-radius: 12px;
     font-size: 2rem;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.2s;
     white-space: nowrap;
 }
 
 .answerbook-btn:hover {
+    border-color: rgba(124, 171, 134, 0.8);
+    background-color: rgba(124, 171, 134, 0.25);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(124, 171, 134, 0.4);
 }
 
 .answerbook-btn:active {
@@ -200,7 +213,7 @@
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-    box-shadow: none;
+    border-color: transparent;
 }
 
 .answerbook-status {
