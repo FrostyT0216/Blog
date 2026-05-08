@@ -1,7 +1,7 @@
 {{ define "main" }}
 {{ $page := . }}
 <div class="article-container">
-    <div class="article-header" style="margin-bottom: 2rem;">
+    <div class="article-header" style="margin-bottom: 1rem;">
         <h1 class="article-title">{{ $page.Title }}</h1>
     </div>
 
@@ -42,6 +42,19 @@
 
         <!-- 下半部分：歌词显示 -->
         <div class="player-lyrics-section">
+            <div class="player-lyrics-toolbar">
+                <button class="lyric-font-btn" id="lyric-font-decrease" aria-label="缩小歌词字号" title="缩小歌词">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12h16"/>
+                    </svg>
+                </button>
+                <span class="lyric-font-label">歌词大小</span>
+                <button class="lyric-font-btn" id="lyric-font-increase" aria-label="放大歌词字号" title="放大歌词">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                </button>
+            </div>
             <div class="player-lyrics-container" id="player-lyrics-container">
                 <div class="player-lyrics-list" id="player-lyrics-list"></div>
             </div>
@@ -56,9 +69,9 @@
 .music-player-layout {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-    margin: 1.5rem 0;
-    padding: 2rem;
+    gap: 2rem;
+    margin: 0.5rem 0;
+    padding: 1.5rem 2rem;
 }
 
 /* ========== 上半部分：封面 + 控制 ========== */
@@ -270,9 +283,67 @@
     background: rgba(124, 171, 134, 0.12);
 }
 
+.player-lyrics-toolbar {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background: rgba(124, 171, 134, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.player-lyrics-section:hover .player-lyrics-toolbar {
+    opacity: 1;
+}
+
+.lyric-font-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--body-text-color);
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    padding: 0;
+}
+
+.lyric-font-btn:hover {
+    background: rgba(124, 171, 134, 0.3);
+    transform: scale(1.1);
+}
+
+.lyric-font-btn:active {
+    transform: scale(0.95);
+}
+
+.lyric-font-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.lyric-font-label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    color: var(--body-text-color);
+    user-select: none;
+}
+
 .player-lyrics-container {
     height: 100%;
     overflow-y: hidden;
+    overflow-x: hidden;
     position: relative;
     mask-image: linear-gradient(
         to bottom,
@@ -302,7 +373,7 @@
     line-height: 2.4;
     color: var(--body-text-color);
     opacity: 0.45;
-    transition: opacity 0.35s ease, transform 0.35s ease, font-weight 0.35s ease;
+    transition: opacity 0.35s ease, transform 0.35s ease, font-weight 0.35s ease, font-size 0.35s ease;
     transform: scale(0.96);
     cursor: default;
     white-space: nowrap;
@@ -326,12 +397,12 @@
 @media (max-width: 640px) {
     .music-player-layout {
         padding: 1rem;
-        gap: 1.8rem;
+        gap: 1.5rem;
     }
 
     .player-top-section {
         flex-direction: column;
-        gap: 1.8rem;
+        gap: 1.5rem;
     }
 
     .player-cover-wrapper {
@@ -385,20 +456,14 @@
         width: 28px;
         height: 28px;
     }
-}
 
-/* 封面旋转动画（播放时） */
-@keyframes rotateCover {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
+    .player-lyrics-toolbar {
+        opacity: 1;
+    }
 
-.player-cover.playing {
-    animation: rotateCover 20s linear infinite;
-}
-
-.player-cover.paused {
-    animation-play-state: paused;
+    .lyric-font-label {
+        display: none;
+    }
 }
 </style>
 
@@ -428,13 +493,18 @@
     const titleEl = document.getElementById('player-title');
     const artistEl = document.getElementById('player-artist');
     const lyricsList = document.getElementById('player-lyrics-list');
+    const fontDecreaseBtn = document.getElementById('lyric-font-decrease');
+    const fontIncreaseBtn = document.getElementById('lyric-font-increase');
 
     // ========== 状态 ==========
     let isPlaying = false;
     let isDragging = false;
     let lyricsData = [];
     let currentLyricIndex = -1;
-    let animationFrameId = null;
+    let lyricFontSize = 1.6;
+    const MIN_FONT_SIZE = 1.0;
+    const MAX_FONT_SIZE = 2.4;
+    const FONT_STEP = 0.2;
 
     // ========== 初始化 ==========
     function init() {
@@ -503,7 +573,23 @@
             div.className = 'player-lyric-line';
             div.textContent = lyricsData[i].text || '\u00A0';
             div.dataset.index = i;
+            div.style.fontSize = lyricFontSize + 'rem';
             lyricsList.appendChild(div);
+        }
+    }
+
+    // ========== 更新歌词字号 ==========
+    function updateLyricFontSize() {
+        const lines = lyricsList.querySelectorAll('.player-lyric-line');
+        lines.forEach(line => {
+            line.style.fontSize = lyricFontSize + 'rem';
+        });
+        // 重新计算当前歌词位置
+        if (currentLyricIndex >= 0 && lines[currentLyricIndex]) {
+            const containerHeight = lyricsList.parentElement.clientHeight;
+            const lineHeight = lines[currentLyricIndex].offsetHeight;
+            const offset = lines[currentLyricIndex].offsetTop - containerHeight / 2 + lineHeight / 2;
+            lyricsList.style.transform = `translateY(${-offset}px)`;
         }
     }
 
@@ -584,15 +670,12 @@
         isPlaying = true;
         iconPlay.style.display = 'none';
         iconPause.style.display = 'block';
-        coverImg.classList.add('playing');
-        coverImg.classList.remove('paused');
     }
 
     function onPause() {
         isPlaying = false;
         iconPlay.style.display = 'block';
         iconPause.style.display = 'none';
-        coverImg.classList.add('paused');
     }
 
     // ========== 事件绑定 ==========
@@ -612,7 +695,6 @@
             isPlaying = false;
             iconPlay.style.display = 'block';
             iconPause.style.display = 'none';
-            coverImg.classList.remove('playing', 'paused');
             progressFill.style.width = '0%';
             progressThumb.style.left = '0%';
             timeCurrent.textContent = '0:00';
@@ -646,6 +728,23 @@
         });
         document.addEventListener('touchend', () => {
             if (isDragging) isDragging = false;
+        });
+
+        // 歌词字号调整
+        fontDecreaseBtn.addEventListener('click', () => {
+            if (lyricFontSize > MIN_FONT_SIZE) {
+                lyricFontSize = Math.round((lyricFontSize - FONT_STEP) * 10) / 10;
+                if (lyricFontSize < MIN_FONT_SIZE) lyricFontSize = MIN_FONT_SIZE;
+                updateLyricFontSize();
+            }
+        });
+
+        fontIncreaseBtn.addEventListener('click', () => {
+            if (lyricFontSize < MAX_FONT_SIZE) {
+                lyricFontSize = Math.round((lyricFontSize + FONT_STEP) * 10) / 10;
+                if (lyricFontSize > MAX_FONT_SIZE) lyricFontSize = MAX_FONT_SIZE;
+                updateLyricFontSize();
+            }
         });
     }
 
