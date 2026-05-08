@@ -389,5 +389,15 @@ document.addEventListener("DOMContentLoaded", function() {
       ripple.remove();
     });
   });
+
+  // 移动端点击汉堡菜单自动回到顶部
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleMenu = document.getElementById('toggle-menu');
+    if (toggleMenu && window.innerWidth <= 767) {
+      toggleMenu.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  });
 </script>
 

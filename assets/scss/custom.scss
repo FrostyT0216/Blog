@@ -293,3 +293,47 @@ html[data-scheme="dark"] .bing-wrapper .bing-mask {
     }
 }
 
+/* ================================
+   移动端导航栏优化：不固定导航栏，只固定汉堡按钮
+   ================================ */
+@media (max-width: 767px) {
+    /* 导航栏取消固定，恢复普通文档流 */
+    .sidebar.left-sidebar {
+        position: relative !important;
+        top: auto !important;
+        border-radius: 0 0 20px 20px;
+        overflow: hidden;
+    }
+
+    /* 伪元素背景同步圆角 */
+    .sidebar.left-sidebar::before {
+        border-radius: 0 0 20px 20px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    html[data-scheme="dark"] .sidebar.left-sidebar::before {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 展开的菜单底部圆角 */
+    #main-menu {
+        border-radius: 0 0 16px 16px;
+    }
+
+    /* 汉堡菜单按钮固定定位 */
+    #toggle-menu {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: rgba(124, 171, 134, 0.45);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 12px;
+        padding: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+}
+
