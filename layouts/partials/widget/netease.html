@@ -32,9 +32,12 @@
 </section>
 
 <style>
-/* 匹配你自定义的归档/标签云毛玻璃样式。
-这里通过对 a 标签及其容器应用你的统一 rgba(124, 171, 134) 色系毛玻璃。
-通过给外层 section 添加 archives class 从而去除默认白底。*/
+/* 网易云推荐卡片：液态玻璃特效
+   —— 与 custom.scss 的 .archives-year a 共用同一套配方：
+     1. 半透明主题色背景 + backdrop-filter 折射
+     2. inset 镜面高光（顶亮底暗）
+     3. ::before 用 mask 抠出一条 1.4px 渐变亮边，颜色为主题色 #7cab86
+   通过给外层 section 添加 archives class 从而去除默认白底。*/
 
 .widget--netease {
     padding: 2px 0;
@@ -44,24 +47,61 @@
     /* 与你的 custom.scss 中的 .archives-year a 统一参数 */
     display: block;
     margin: 4px;
-    border-radius: 8px;
+    border-radius: 14px;
     text-decoration: none;
-    
-    background: rgba(124, 171, 134, 0.15) !important;
-    background-color: rgba(124, 171, 134, 0.15) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    border: 2px solid transparent !important;
+
+    /* 液态玻璃：不糊背景，镜面光照（光源右上 specular、折射左下） */
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.04) !important;
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.04) !important;
+    background-image:
+        radial-gradient(ellipse 75% 55% at 100% 0%,
+            rgba(255, 255, 255, 0.22) 0%,
+            rgba(255, 255, 255, 0.06) 30%,
+            transparent 60%),
+        radial-gradient(ellipse 65% 45% at 0% 100%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.14) 0%,
+            transparent 55%) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow:
+        inset -2px 2px 3px rgba(255, 255, 255, 0.18),
+        inset 2px -2px 4px rgba(0, 0, 0, 0.04) !important;
+
+    border: none !important;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 边缘高光：用 mask 抠出一条 1.4px 渐变亮边（颜色为 #7cab86） */
+.netease-link::before,
+.netease-comment::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 0%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 20%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 80%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Hover 特效对齐你的归档 */
 .netease-link:hover {
-    border-color: rgba(124, 171, 134, 0.8) !important;
-    background-color: rgba(124, 171, 134, 0.25) !important;
+    border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.8) !important;
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.16) !important;
 }
 
 .netease-link {

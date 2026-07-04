@@ -17,9 +17,93 @@
 
     /* 程式碼字體 (通常建議保留等寬字體 monospace，視需求修改) */
     /* --code-font-family: 'MyCustomFont', monospace; */
+
+    /* 液态玻璃统一主题色变量：边缘高光、内层填充都引用这里 */
+    --glass-theme-r: 124;
+    --glass-theme-g: 171;
+    --glass-theme-b: 134;
 }
 
-/* 右侧归档和分类内部按钮小卡片的毛玻璃与悬浮特效 */
+/* ================================================================
+   液态玻璃 mixin
+   —— 整理自 Outpace Studios《Liquid glass for the web》
+
+   教程核心论点：Blur isn't glass.
+   「磨砂 + 亮边」是市面上大多数伪液态玻璃的通病——把背景糊掉再描一圈
+   亮线，看起来像磨砂板照片，不像玻璃。真正的液态玻璃：
+     · 中心通透，背景像素清晰可见，不糊
+     · 边缘弯折最剧烈——亮边（折射）只在 rim 出现
+     · 光有方向：光源从右上方打来 → 右上是镜面 specular 高光，
+       左下是折射后的环境色回光（这里取主题色 #7cab86）
+   故本 mixin：
+     1. 不使用 backdrop-filter blur（去掉磨砂感），让 Bing 壁纸原样透出
+     2. 用两层 radial-gradient 描出对角线光照：右上白 specular、左下绿折射
+     3. inset box-shadow 走对角线：右上亮、左下淡阴影
+     4. ::before 用 mask 抠出 1.4px 渐变亮边，渐变方向 135deg
+        （亮在 0% 左下角、100% 右上角，正是玻璃两侧弯折点）
+   ================================================================ */
+@mixin liquid-glass($fill-alpha: 0.04, $highlight-alpha: 0.45) {
+    /* 极淡主题色填充：仅作为玻璃的色偏，不糊背景 */
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), $fill-alpha) !important;
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), $fill-alpha) !important;
+
+    /* 镜面光照（双层 radial）：光源在右上，折射回光在左下 */
+    background-image:
+        radial-gradient(ellipse 75% 55% at 100% 0%,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0.05) 30%,
+            transparent 60%),
+        radial-gradient(ellipse 65% 45% at 0% 100%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.12) 0%,
+            transparent 55%) !important;
+
+    /* 去掉磨砂：不使用 backdrop-filter blur */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    /* inset 阴影走对角线：右上 specular 亮、左下淡阴影（光从右上方来）
+       不再加 inset 0 0 0 1px 内描边——它与 mask 亮边叠加会让边缘过厚 */
+    box-shadow:
+        inset -1.5px 1.5px 2px rgba(255, 255, 255, 0.15),
+        inset 1.5px -1.5px 3px rgba(0, 0, 0, 0.03) !important;
+    border: none !important;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
+    /* 边缘高光：mask 抠出 1.4px 渐变亮边
+       135deg → 0% 在左下角、100% 在右上角，亮在两侧弯折点（主题色）
+       透明带 40%-60%（宽），宽卡片中段无边光，只有对角角落亮 */
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.4px;
+        background: linear-gradient(
+            135deg,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), $highlight-alpha) 0%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), $highlight-alpha * 0.33) 20%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), $highlight-alpha * 0.33) 80%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), $highlight-alpha) 100%
+        );
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* 清除 Stack 主题自带的 ::after 装饰（::before 已被液态玻璃占用） */
+    &::after {
+        display: none !important;
+        background: transparent !important;
+    }
+}
+
+/* 右侧归档和分类内部按钮小卡片的液态玻璃与悬浮特效 */
 .archives-year a, 
 .tagCloud-tags a {
     /* 排版和内边距适应独立卡片形态 */
@@ -28,31 +112,17 @@
     justify-content: space-between;
     padding: 8px 12px;
     margin: 4px;
-    border-radius: 8px;
+    border-radius: 14px;
     text-decoration: none;
 
-    /* 强制移除原有白底，应用毛玻璃背景色 #7cab86，带透明度 */
-    background: rgba(124, 171, 134, 0.15) !important;
-    background-color: rgba(124, 171, 134, 0.15) !important;
-    background-image: none !important; /* 清除可能存在的渐变背景 */
-    box-shadow: none !important; /* 清除可能存在的卡片阴影 */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    @include liquid-glass($fill-alpha: 0.04);
     
-    /* 清除 Stack 主题经常使用的伪元素白底或底色 */
-    &::before, &::after {
-        display: none !important;
-        background: transparent !important;
-    }
-    
-    /* 边框初始透明，以备 hover 时变色不引起跳动 */
-    border: 2px solid transparent !important;
     transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     
     /* 鼠标悬浮时边框颜色加深强调 */
     &:hover {
-        border-color: rgba(124, 171, 134, 0.8) !important;
-        background-color: rgba(124, 171, 134, 0.25) !important;
+        border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.8) !important;
+        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16) !important;
     }
 }
 
@@ -63,7 +133,7 @@
     margin: 4px 0 8px 0;
 }
 
-/* 去除小卡片外层容器自带的白底，让毛玻璃按钮仿佛悬浮在网页背景上 */
+/* 去除小卡片外层容器自带的白底，让液态玻璃按钮仿佛悬浮在网页背景上 */
 .widget.archives,
 .widget.categories,
 .widget--archives,
@@ -76,23 +146,11 @@
     border: none !important;
 }
 
-/* 搜索框容器的毛玻璃特效和圆角 */
+/* 搜索框容器的液态玻璃特效和圆角 */
 .search-form.widget {
-    /* 毛玻璃背景和参数 */
-    background: rgba(124, 171, 134, 0.15) !important;
-    background-color: rgba(124, 171, 134, 0.15) !important;
-    background-image: none !important; /* 清除默认白色 */
-    box-shadow: none !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    /* 圆角设置为20px */
+    @include liquid-glass($fill-alpha: 0.04);
+
     border-radius: 20px !important;
-    
-    /* 避免它和内部 input 或以前外层的伪元素冲突 */
-    &::before, &::after {
-        display: none !important;
-    }
 
     /* 去除内部搜索输入框本体自带的白底块 */
     input {
@@ -106,44 +164,30 @@
         background: transparent !important;
     }
 
-    /* 悬浮强调边框手感 */
-    border: 2px solid transparent !important;
     transition: border-color 0.3s ease, background-color 0.3s ease;
     
     &:hover {
-        border-color: rgba(124, 171, 134, 0.8) !important;
-        background-color: rgba(124, 171, 134, 0.25) !important;
+        border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.8) !important;
+        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16) !important;
     }
 }
 
-/* 文章右侧目录 (TOC) 卡片的毛玻璃特效 */
+/* 文章右侧目录 (TOC) 卡片的液态玻璃特效 */
 .widget--toc,
 .widget.toc {
-    /* 毛玻璃背景和参数 */
-    background: rgba(124, 171, 134, 0.15) !important;
-    background-color: rgba(124, 171, 134, 0.15) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    @include liquid-glass($fill-alpha: 0.04);
+
+    border-radius: 18px !important;
     
-    border-radius: 15px !important; /* 调整为一个优雅的圆角 */
-    
-    /* 边框初始透明，以备 hover 时变色不引起跳动 */
-    border: 2px solid transparent !important;
     transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     
     &:hover {
-        border-color: rgba(124, 171, 134, 0.8) !important;
-        background-color: rgba(124, 171, 134, 0.25) !important;
-    }
-
-    &::before, &::after {
-        display: none !important;
+        border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.8) !important;
+        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16) !important;
     }
 }
 
-/* 去除 TOC 内部原生导航自带的背景（如果有），防止跟外层毛玻璃冲突 */
+/* 去除 TOC 内部原生导航自带的背景（如果有），防止跟外层液态玻璃冲突 */
 #TableOfContents {
     background: transparent !important;
     background-color: transparent !important;
@@ -172,7 +216,7 @@ b, strong {
 }
 
 /* ================================
-   左侧个人信息与导航侧边栏毛玻璃特效 
+   左侧个人信息与导航侧边栏液态玻璃特效 
    ================================ */
 .sidebar.left-sidebar {
     /* 移除侧边栏本身的背景，将视觉交由伪元素无限向左延伸 */
@@ -183,33 +227,106 @@ b, strong {
     -webkit-backdrop-filter: none !important;
     /* 恢复主题默认的 sticky 属性，让其在滚动时固定不动，伪元素依旧能以此为定位原点 */
     position: sticky !important; 
-    top: 2rem !important; /* 根据需要也可以用 var(--margin) */
+    top: 2rem !important;
 }
 
-/* 使用伪元素向左侧无限延展背景，以填满网页中心布局产生的留白 */
+/* 使用伪元素向左侧无限延展背景：液态玻璃面板本体
+   —— 这是侧边栏真正的「玻璃」，承担折射与镜面反射
+   遵循液态玻璃原则：不糊背景（无 blur），仅以镜面光照和对角线边光塑形 */
 .sidebar.left-sidebar::before {
     content: "";
     position: absolute;
     top: 0;
     bottom: 0;
-    right: 0; /* 右侧贴齐侧边栏原有的右边缘 */
-    width: 100vw; /* 向左无限铺满整个屏幕宽度，彻底消除左侧空隙 */
-    z-index: -1; /* 垫在文字和头像内容下方 */
-    
-    /* 苍绿色毛玻璃视觉 */
-    background: rgba(124, 171, 134, 0.45); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    box-shadow: 2px 0 15px rgba(0,0,0,0.05);
-    
+    right: 0;            /* 右侧贴齐侧边栏原有的右边缘 */
+    width: 100vw;        /* 向左无限铺满整个屏幕宽度，彻底消除左侧空隙 */
+    z-index: -1;         /* 垫在文字和头像内容下方 */
+
+    /* 极淡主题色填充：仅作玻璃色偏，不糊背景（让 Bing 壁纸原样透出） */
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.05);
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.05);
+
+    /* 镜面光照（双层 radial）：光源在右上，折射回光在左下
+       —— 侧边栏左侧延伸到屏幕外，但右上是可见的镜面高光，
+          左下的折射绿光会沿底部边缘渗入可见区域 */
+    background-image:
+        radial-gradient(ellipse 70% 50% at 100% 0%,
+            rgba(255, 255, 255, 0.20) 0%,
+            rgba(255, 255, 255, 0.05) 30%,
+            transparent 60%),
+        radial-gradient(ellipse 80% 55% at 0% 100%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.12) 0%,
+            transparent 55%);
+
+    /* 去掉磨砂：不使用 backdrop-filter blur */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    /* inset 阴影走对角线：右上 specular 亮、左下淡阴影 + 右侧外投影增加立体感
+       不加 inset 0 0 0 1px 内描边——它会与 ::after mask 亮边叠加让边缘过厚 */
+    box-shadow:
+        inset -2px 2px 3px rgba(255, 255, 255, 0.16),
+        inset 2px -2px 4px rgba(0, 0, 0, 0.04),
+        2px 0 15px rgba(0, 0, 0, 0.05);
+
     border-radius: 0 35px 35px 0;
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    border: none;
 }
 
-/* 暗黑模式下左侧导航栏的毛玻璃适配，保留苍绿色调并混合些许暗色 */
+/* 侧边栏右侧边缘液态玻璃亮边（颜色为 #7cab86 主题色）
+   —— 侧边栏左半部分延伸到屏幕外，可见边缘只在右侧、顶部、底部，
+      用 ::after 复刻 mask 亮边技法。
+   渐变方向 135deg：亮在右上（specular 镜面）和左下（折射回光，沿底部边缘渗入可见区域） */
+.sidebar.left-sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    z-index: -1;
+    border-radius: 0 35px 35px 0;
+    padding: 1.4px;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 0%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 20%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 80%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* 暗黑模式下左侧导航栏的液态玻璃适配：降低填充透明度，保留对角线光照 */
 html[data-scheme="dark"] .sidebar.left-sidebar::before {
-    background: rgba(124, 171, 134, 0.25);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.03);
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.03);
+    /* 暗色环境下提升 specular 与折射的可见度 */
+    background-image:
+        radial-gradient(ellipse 70% 50% at 100% 0%,
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.04) 30%,
+            transparent 60%),
+        radial-gradient(ellipse 80% 55% at 0% 100%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.18) 0%,
+            transparent 55%);
+}
+
+html[data-scheme="dark"] .sidebar.left-sidebar::after {
+    background: linear-gradient(
+        135deg,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.55) 0%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.18) 20%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.18) 80%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.55) 100%
+    );
 }
 
 /* 强制让页脚由于自定义添加导致字色写死的统计代码跟随主题环境（明暗模式）自适应 */
@@ -308,13 +425,20 @@ html[data-scheme="dark"] .bing-wrapper .bing-mask {
     /* 伪元素背景同步圆角 */
     .sidebar.left-sidebar::before {
         border-radius: 0 0 20px 20px;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-    html[data-scheme="dark"] .sidebar.left-sidebar::before {
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* 移动端侧边栏亮边：对角线方向（135deg），右上 specular + 左下折射 */
+    .sidebar.left-sidebar::after {
+        border-radius: 0 0 20px 20px;
+        background: linear-gradient(
+            135deg,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 0%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 20%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 80%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 100%
+        );
     }
 
     /* 展开的菜单底部圆角 */
@@ -322,18 +446,110 @@ html[data-scheme="dark"] .bing-wrapper .bing-mask {
         border-radius: 0 0 16px 16px;
     }
 
-    /* 汉堡菜单按钮固定定位 */
+    /* 汉堡菜单按钮：液态玻璃（独立的小透镜，不糊背景） */
     #toggle-menu {
         position: fixed;
         top: 10px;
         right: 10px;
         z-index: 1000;
-        background: rgba(124, 171, 134, 0.45);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border-radius: 12px;
+
+        /* 极淡主题色填充 */
+        background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.05) !important;
+        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.05) !important;
+
+        /* 镜面光照：光源右上，折射左下 */
+        background-image:
+            radial-gradient(ellipse 75% 55% at 100% 0%,
+                rgba(255, 255, 255, 0.22) 0%,
+                rgba(255, 255, 255, 0.06) 30%,
+                transparent 60%),
+            radial-gradient(ellipse 65% 45% at 0% 100%,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.14) 0%,
+                transparent 55%) !important;
+
+        /* 去掉磨砂：不使用 backdrop-filter blur */
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        /* inset 阴影走对角线：右上亮、左下淡阴影
+           不加 inset 0 0 0 1px 内描边——与 mask 亮边叠加会让边缘过厚 */
+        box-shadow:
+            inset -2px 2px 3px rgba(255, 255, 255, 0.18),
+            inset 2px -2px 4px rgba(0, 0, 0, 0.04),
+            0 2px 10px rgba(0, 0, 0, 0.10) !important;
+        border: none !important;
+        border-radius: 14px;
         padding: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+        isolation: isolate;
+
+        /* 边缘高光：135deg 对角线，亮在右上和左下
+           透明带 40%-60%（宽），宽卡片中段无边光，只有对角角落亮 */
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1.4px;
+            background: linear-gradient(
+                135deg,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 0%,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 20%,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 80%,
+                rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 1;
+        }
     }
 }
 
+/* ================================
+   无障碍降级（教程第 6 节）
+   ================================ */
+
+/* 透明度敏感用户：完全去掉折射换成不透明面板，文字坐在纯色表面上满对比度 */
+@media (prefers-reduced-transparency: reduce) {
+    .archives-year a,
+    .tagCloud-tags a,
+    .search-form.widget,
+    .widget--toc,
+    .widget.toc,
+    .sidebar.left-sidebar::before,
+    #toggle-menu {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.85) !important;
+        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.85) !important;
+        background-image: none !important;
+    }
+    /* 关闭液态玻璃边缘亮边 */
+    .archives-year a::before,
+    .tagCloud-tags a::before,
+    .search-form.widget::before,
+    .widget--toc::before,
+    .widget.toc::before,
+    #toggle-menu::before {
+        display: none !important;
+    }
+    .sidebar.left-sidebar::after {
+        display: none !important;
+    }
+}
+
+/* 运动敏感用户：禁用透镜过渡动画（这里主要是 hover 过渡） */
+@media (prefers-reduced-motion: reduce) {
+    .archives-year a,
+    .tagCloud-tags a,
+    .search-form.widget,
+    .widget--toc,
+    .widget.toc,
+    #toggle-menu {
+        transition: none !important;
+    }
+}

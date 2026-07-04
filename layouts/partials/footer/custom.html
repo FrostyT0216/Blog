@@ -15,7 +15,7 @@
     --code-font-family: 'YuWoErYanNi', monospace;
   }
 
-  /* 顶部加载提示卡片毛玻璃效果（苍绿色） */
+  /* 顶部加载提示卡片：液态玻璃（苍绿色 #a4c9a6） */
   .page-loading-card {
     position: fixed;
     top: 30px;
@@ -23,32 +23,81 @@
     transform: translateX(-50%);
     z-index: 99999;
     padding: 10px 24px;
-    background: rgba(164, 201, 166, 0.4); /* 苍绿色半透明 */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(164, 201, 166, 0.8);
-    border-radius: 999px; /* 大圆角 */
-    box-shadow: 0 4px 12px rgba(164, 201, 166, 0.2);
+
+    /* 液态玻璃：不糊背景，镜面光照（光源右上 specular、折射左下） */
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.08);
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.08);
+    background-image:
+      radial-gradient(ellipse 75% 55% at 100% 0%,
+          rgba(255, 255, 255, 0.24) 0%,
+          rgba(255, 255, 255, 0.07) 30%,
+          transparent 60%),
+      radial-gradient(ellipse 65% 45% at 0% 100%,
+          rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16) 0%,
+          transparent 55%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow:
+      0 4px 12px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.2),
+      inset -2px 2px 3px rgba(255, 255, 255, 0.20),
+      inset 2px -2px 4px rgba(0, 0, 0, 0.04),
+      inset 0 0 0 1px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.07);
+    border: 1px solid rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.8);
+    border-radius: 999px; /* 大圆角（药丸形） */
     color: var(--sys-color-text, #333);
     font-size: 15px;
     font-weight: 500;
     cursor: pointer; /* 提示可点击关闭 */
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
     animation: borderBlink 1.5s infinite alternate; /* 边框闪烁动画 */
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* 边缘高光：mask 抠出 1.4px 渐变亮边（颜色为苍绿色 #a4c9a6） */
+  .page-loading-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 0%,
+      rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 20%,
+      rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+      rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+      rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 80%,
+      rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
   }
 
   @keyframes borderBlink {
     0% {
-      border-color: rgba(164, 201, 166, 0.2);
+      border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.2);
     }
     100% {
-      border-color: rgba(164, 201, 166, 1);
+      border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 1);
     }
   }
 
   /* 当深色模式生效时（配合主体的 dark mode 支持） */
   [data-scheme="dark"] .page-loading-card {
-    background: rgba(50, 75, 55, 0.4); /* 暗一点的苍绿色 */
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.05);
+    /* 暗色环境下提升 specular 与折射的可见度 */
+    background-image:
+      radial-gradient(ellipse 75% 55% at 100% 0%,
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(255, 255, 255, 0.04) 30%,
+          transparent 60%),
+      radial-gradient(ellipse 65% 45% at 0% 100%,
+          rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.18) 0%,
+          transparent 55%);
     color: #eee;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
@@ -220,7 +269,7 @@
       if (loadingCard && msgEl) {
           // 停止闪烁边框，代表加载完成
           loadingCard.style.animation = 'none';
-          loadingCard.style.borderColor = 'rgba(164, 201, 166, 0.4)';
+          loadingCard.style.borderColor = 'rgba(124, 171, 134, 0.4)';
           
           if(counterEl) counterEl.style.display = 'none';
           
@@ -260,37 +309,82 @@
 
 {{ if not .IsPage }}
 <style>
-/* 随机金句置顶卡片 */
+/* 随机金句置顶卡片：液态玻璃（主题色 #7cab86） */
 .random-saying-card {
     width: 100%;
     box-sizing: border-box;
     margin: 0 0 15px 0; /* 减小底部间距，让其和下方文章列表更紧凑 */
     padding: 20px 25px;
     border-radius: var(--card-border-radius, 12px);
-    background: rgba(124, 171, 134, 0.15) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid #7cab86;
-    box-shadow: var(--shadow-sm, 0 4px 15px rgba(124, 171, 134, 0.2));
+
+    /* 液态玻璃：不糊背景，镜面光照（光源右上 specular、折射左下） */
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.04) !important;
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.04) !important;
+    background-image:
+        radial-gradient(ellipse 75% 55% at 100% 0%,
+            rgba(255, 255, 255, 0.22) 0%,
+            rgba(255, 255, 255, 0.06) 30%,
+            transparent 60%),
+        radial-gradient(ellipse 65% 45% at 0% 100%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.14) 0%,
+            transparent 55%) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow:
+        0 4px 15px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.2),
+        inset -2px 2px 3px rgba(255, 255, 255, 0.18),
+        inset 2px -2px 4px rgba(0, 0, 0, 0.04);
+    border: none;
     text-align: center;
     transition: all 0.3s ease;
     cursor: pointer;
     user-select: none;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* 边缘高光：mask 抠出 1.4px 渐变亮边（颜色为 #7cab86） */
+.random-saying-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 0%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 20%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 40%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0) 60%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.15) 80%,
+        rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.45) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
 }
 .random-saying-card:hover {
-    background: rgba(124, 171, 134, 0.25) !important;
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.16) !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(124, 171, 134, 0.3);
+    box-shadow:
+        0 6px 20px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12),
+        inset 0 -1px 2px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.12);
 }
 .random-saying-card .saying-text {
     font-weight: bold;
     color: #7cab86 !important;
     font-size: 1.8rem; /* 与文章标题字号保持一致（由于存在响应式缩放，也可适当降低为 1.7rem） */
     line-height: 1.5;
+    position: relative;
+    z-index: 2;
 }
 html[data-scheme="dark"] .random-saying-card {
-    background: rgba(124, 171, 134, 0.08) !important;
-    border-color: rgba(124, 171, 134, 0.5);
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.04) !important;
+    border-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b),0.5);
 }
 html[data-scheme="dark"] .random-saying-card .saying-text {
     color: #7cab86 !important; /* 或者使用相对亮一点的保护色 */
@@ -354,8 +448,8 @@ document.addEventListener("DOMContentLoaded", function() {
     animation: ripple-animation 0.6s ease-out;
     pointer-events: none;
     z-index: 999999;
-    border: 2px solid rgba(164, 201, 166, 0.8); /* 苍绿色，和网站的主色调保持一致 */
-    background: rgba(164, 201, 166, 0.2);
+    border: 2px solid rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.8); /* 主题色 #7cab86 */
+    background: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.2);
   }
 
   @keyframes ripple-animation {
