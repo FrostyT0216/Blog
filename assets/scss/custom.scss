@@ -329,6 +329,29 @@ html[data-scheme="dark"] .sidebar.left-sidebar::after {
     );
 }
 
+/* ================================================================
+   亮色模式下的液态玻璃适配：提升对比度
+   —— 白色/浅色壁纸下，主题色 #7cab86 的淡透明填充几乎看不清，
+      故在亮色模式改用浅灰填充；深色模式保持原有主题色填充。
+   ================================================================ */
+html[data-scheme="light"] .archives-year a,
+html[data-scheme="light"] .tagCloud-tags a,
+html[data-scheme="light"] .search-form.widget,
+html[data-scheme="light"] .widget--toc,
+html[data-scheme="light"] .widget.toc,
+html[data-scheme="light"] #toggle-menu,
+html[data-scheme="light"] .sidebar.left-sidebar::before {
+    background-color: rgba(230, 230, 230, 0.35) !important;
+}
+
+html[data-scheme="light"] .archives-year a:hover,
+html[data-scheme="light"] .tagCloud-tags a:hover,
+html[data-scheme="light"] .search-form.widget:hover,
+html[data-scheme="light"] .widget--toc:hover,
+html[data-scheme="light"] .widget.toc:hover {
+    background-color: rgba(210, 210, 210, 0.5) !important;
+}
+
 /* 强制让页脚由于自定义添加导致字色写死的统计代码跟随主题环境（明暗模式）自适应 */
 .count_info,
 .count_info div,
