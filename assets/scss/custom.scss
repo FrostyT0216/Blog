@@ -381,8 +381,8 @@ body {
 .bing-wrapper .bing-mask {
     position: absolute;
     inset: 0;
-    /* 明亮模式：改回叠加 80% 的白色遮罩 */
-    background: rgba(255, 255, 255, 0.8);
+    /* 明亮模式：遮罩完全透明，直接显示必应壁纸原图 */
+    background: transparent;
     transition: background-color 0.5s ease;
 }
 
