@@ -1,5 +1,5 @@
 # Change baseurl before deploy
-baseurl = "https://frostyt0216.github.io/Blog/"
+baseurl = "http://frospon.top/"
 locale = "en-us"
 title = "冰茶FrostyT's Blog"
 copyright = "FrostyT's Blog"

@@ -9,10 +9,10 @@ menu:
 links:
   - title: 二维码生成器
     description: 在线生成自定义二维码，支持颜色/尺寸/透明背景
-    website: https://frostyt0216.github.io/Blog/qrcode/
+    website: http://frospon.top/qrcode/
     image: https://api.iconify.design/tabler:qrcode.svg?color=%237cab86
   - title: 答案之书
     description: 在心中默念问题，翻开书本寻找答案
-    website: https://frostyt0216.github.io/Blog/answerbook/
+    website: http://frospon.top/answerbook/
     image: https://api.iconify.design/tabler:book.svg?color=%237cab86
 ---
