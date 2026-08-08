@@ -25,8 +25,21 @@ favicon = "/favicon.png"
         default = "Licensed under CC BY-NC-SA 4.0"
 
 [comments]
-    enabled = false
-    provider = "disqus"
+    enabled = true
+    provider = "waline"
+
+    # Waline client configuration see: https://waline.js.org/reference/client.html
+    [comments.waline]
+        serverURL = "https://comment.frospon.top"
+        lang = "zh-CN"
+        pageview = true
+        emoji = ["https://unpkg.com/@waline/emojis@1.4.0/weibo", "https://unpkg.com/@waline/emojis@1.4.0/bmoji"]
+        requiredMeta = ["name", "email"]
+        reaction = true
+
+        [comments.waline.locale]
+            admin = "冰茶FrostyT"
+            placeholder = "快来留下你的评论吧~"
 
 [widgets]
     homepage = [

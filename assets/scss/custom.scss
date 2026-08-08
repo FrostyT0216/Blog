@@ -340,6 +340,35 @@ html[data-scheme="dark"] .sidebar.left-sidebar::after {
     color: var(--body-text-color) !important;
 }
 
+/* ================================
+   Waline 评论系统跟随 Stack 主题明暗模式
+   —— 将 Waline 自有的 CSS 变量映射到主题变量，
+      让评论框文字/背景/边框在亮暗模式下都与站点卡片风格一致
+   ================================ */
+.waline-container {
+    /* 文字色跟随主题卡片文字色（亮色 #000 / 暗色 rgba(255,255,255,0.9)） */
+    --waline-color: var(--card-text-color-main);
+    --waline-dark-grey: var(--card-text-color-main);
+    --waline-light-grey: var(--card-text-color-secondary);
+
+    /* 背景跟随主题卡片背景 */
+    --waline-bgcolor: var(--card-background);
+    --waline-bgcolor-light: var(--card-background-selected);
+    --waline-bgcolor-hover: var(--card-background-selected);
+    --waline-disable-bgcolor: var(--card-background-selected);
+    --waline-info-bgcolor: var(--card-background-selected);
+
+    /* 边框跟随主题分隔线颜色 */
+    --waline-border-color: var(--card-separator-color);
+
+    /* 次要/禁用文字色 */
+    --waline-disable-color: var(--card-text-color-tertiary);
+    --waline-info-color: var(--card-text-color-secondary);
+
+    /* 主按钮文字始终为白色（在彩色背景上），覆盖 Waline v2 暗色模式下的 #000 */
+    --waline-white: #fff;
+}
+
 /* 落葉效果 */
 .leaf {
     position: fixed;
@@ -355,9 +384,13 @@ html[data-scheme="dark"] .sidebar.left-sidebar::after {
    全屏必应（Bing）随机壁纸系统 
    ================================ */
 
-/* 清除系统原本的纯色整体背景，让壁纸可以透出来 */
+/* 清除系统原本的纯色整体背景，让壁纸可以透出来
+   —— Stack 主题的 body 只设了 background、未设 color，
+      导致暗色模式下未显式设色的元素（如 Waline 反应标题、预览标题等）
+      继承浏览器默认黑色而不可见。此处补齐全局文字色兜底。 */
 body {
     background: transparent !important;
+    color: var(--body-text-color);
 }
 
 .bing-wrapper {
