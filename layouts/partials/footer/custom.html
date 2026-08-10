@@ -335,21 +335,28 @@ document.addEventListener("DOMContentLoaded", function() {
     refreshBtn.addEventListener('click', function() {
         if (refreshBtn.classList.contains('loading')) return;
 
-        // 解析当前 index，尽量换一张不同的
+        // 解析当前 index 和 mkt，尽量换一张不同的
         let currentIdx = -1;
+        let currentMkt = '';
         try {
             const params = new URL(bingImg.src).searchParams;
             currentIdx = parseInt(params.get('index') || '-1', 10);
+            currentMkt = params.get('mkt') || '';
         } catch (e) {}
 
+        // 多市场 × 8 天 = 更多壁纸选择，避免频繁撞图
+        const markets = ['zh-CN', 'en-US', 'ja-JP', 'en-GB', 'fr-FR', 'de-DE'];
         let newIdx = currentIdx;
+        let newMkt = currentMkt;
         let attempts = 0;
-        while (newIdx === currentIdx && attempts < 10) {
+        while (newIdx === currentIdx && newMkt === currentMkt && attempts < 15) {
             newIdx = Math.floor(Math.random() * 8);
+            newMkt = markets[Math.floor(Math.random() * markets.length)];
             attempts++;
         }
 
-        const newUrl = `https://bing.biturl.top/?resolution=1920&format=image&index=${newIdx}&mkt=zh-CN`;
+        // _t 时间戳破除浏览器缓存的 302 重定向，避免撞旧图
+        const newUrl = `https://bing.biturl.top/?resolution=1920&format=image&index=${newIdx}&mkt=${newMkt}&_t=${Date.now()}`;
         setLoading(true);
 
         // 预加载：确保新图可访问再切换，避免出现空白
