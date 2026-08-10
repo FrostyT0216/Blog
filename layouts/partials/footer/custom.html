@@ -305,8 +305,90 @@
   <div class="bing-wrapper">
     <!-- src 交给了上面的 JS 管理，防止跳转页面时出现闪烁和刷新 -->
     <img alt="Bing壁纸" class="bing-img" />
+    <!-- 点击水波涟漪画布：覆盖在图片之上、遮罩之下；竖屏由 CSS 隐藏 -->
+    <canvas id="bing-ripple-canvas" aria-hidden="true"></canvas>
     <div class="bing-mask"></div>
   </div>
+
+  <!-- Bing 壁纸刷新按钮：随机到了难看的壁纸时可手动换掉 -->
+  <button id="bing-refresh-btn" class="bing-refresh-btn" type="button"
+    aria-label="{{ if eq .Site.Language.Lang "zh-hant-hk" }}換張壁紙{{ else }}换张壁纸{{ end }}"
+    title="{{ if eq .Site.Language.Lang "zh-hant-hk" }}換張壁紙{{ else }}换张壁纸{{ end }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <polyline points="1 20 1 14 7 14"></polyline>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+    </svg>
+  </button>
+
+<script>
+// Bing 壁纸手动刷新：随机换一张，并同步 localStorage 缓存
+document.addEventListener("DOMContentLoaded", function() {
+    const bingImg = document.querySelector('.bing-img');
+    const refreshBtn = document.getElementById('bing-refresh-btn');
+    if (!bingImg || !refreshBtn) return;
+
+    function setLoading(loading) {
+        refreshBtn.classList.toggle('loading', loading);
+    }
+
+    refreshBtn.addEventListener('click', function() {
+        if (refreshBtn.classList.contains('loading')) return;
+
+        // 解析当前 index，尽量换一张不同的
+        let currentIdx = -1;
+        try {
+            const params = new URL(bingImg.src).searchParams;
+            currentIdx = parseInt(params.get('index') || '-1', 10);
+        } catch (e) {}
+
+        let newIdx = currentIdx;
+        let attempts = 0;
+        while (newIdx === currentIdx && attempts < 10) {
+            newIdx = Math.floor(Math.random() * 8);
+            attempts++;
+        }
+
+        const newUrl = `https://bing.biturl.top/?resolution=1920&format=image&index=${newIdx}&mkt=zh-CN`;
+        setLoading(true);
+
+        // 预加载：确保新图可访问再切换，避免出现空白
+        const testImg = new Image();
+        testImg.onload = function() {
+            // 切换 src 会触发 bingImg 的 load 事件，ripple-bing.js 会自动重新上传纹理
+            bingImg.src = newUrl;
+            localStorage.setItem('bing_bg_url', newUrl);
+            localStorage.setItem('bing_bg_date', new Date().toDateString());
+        };
+        testImg.onerror = function() {
+            setLoading(false);
+        };
+        testImg.src = newUrl;
+
+        // bingImg 加载完成后取消 loading
+        const onBingLoad = () => {
+            setLoading(false);
+            bingImg.removeEventListener('load', onBingLoad);
+        };
+        bingImg.addEventListener('load', onBingLoad);
+
+        // 兜底：8 秒后强制取消 loading，防止网络卡住一直转圈
+        setTimeout(() => {
+            bingImg.removeEventListener('load', onBingLoad);
+            setLoading(false);
+        }, 8000);
+    });
+});
+</script>
+
+{{- /* Bing 背景图片点击水波涟漪特效（竖屏下 JS 自身不渲染） */ -}}
+<script type="module">
+  import { initRippleBing } from '{{ "js/ripple-bing.js" | relURL }}';
+  initRippleBing(
+    document.getElementById('bing-ripple-canvas'),
+    document.querySelector('.bing-img')
+  );
+</script>
 
 {{ if not .IsPage }}
 <style>
@@ -495,4 +577,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 </script>
+
+{{- /* 首页/列表页文章封面图 Asciify 波点效果（单篇文章页不需要） */ -}}
+{{ if not .IsPage }}
+<script type="module">
+  import { initAsciifyCovers } from '{{ "js/asciify-cover.js" | relURL }}';
+  initAsciifyCovers();
+</script>
+{{ end }}
 
