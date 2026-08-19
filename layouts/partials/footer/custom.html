@@ -588,11 +588,3 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 </script>
 
-{{- /* 首页/列表页文章封面图 Asciify 波点效果（单篇文章页不需要） */ -}}
-{{ if not .IsPage }}
-<script type="module">
-  import { initAsciifyCovers } from '{{ "js/asciify-cover.js" | relURL }}';
-  initAsciifyCovers();
-</script>
-{{ end }}
-

@@ -805,51 +805,23 @@ html[data-scheme="dark"] .bing-info-card {
 }
 
 /* ================================
-   首页文章封面图 Asciify 波点效果
-   —— 鼠标悬停时，柔和的 ASCII 透镜跟随光标
-   ================================ */
-
-/* 封面图容器设为定位上下文，供输出画布绝对定位 */
-.article-list .article-image {
-    position: relative;
-
-    /* 输出画布：覆盖在图片上方，透镜内渲染 ASCII 字符 */
-    .asciify-output {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        display: block;
-        /* 关键：不拦截指针事件，让点击穿透到下方 <a> 链接；
-           pointermove 事件冒泡到父容器由 JS 捕获 */
-        pointer-events: none;
-        z-index: 2;
-    }
-
-    /* 源画布：仅用于绘制图片供 WebGL 采样，始终隐藏 */
-    .asciify-source {
-        display: none;
-    }
-}
-
-/* ================================
    多邻国连胜天数展示
-   —— 无外框，双行紧凑布局，与主菜单对齐
+   —— 双行紧凑布局，无外框，与主菜单对齐
    ================================ */
 .duolingo-streak-widget {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     margin: 0;
     padding: 0;
     color: var(--body-text-color);
-    line-height: 1.15;
+    line-height: 1.2;
 
     .duolingo-streak-flame {
         flex-shrink: 0;
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         color: #e8702a;
         display: flex;
         align-items: center;
@@ -865,70 +837,37 @@ html[data-scheme="dark"] .bing-info-card {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 1px;
+        gap: 2px;
         min-width: 0;
-    }
-
-    .duolingo-streak-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 4px;
     }
 
     .duolingo-streak-count {
         display: inline-flex;
         align-items: baseline;
-        gap: 1px;
+        gap: 2px;
     }
 
     .duolingo-streak-days {
-        font-size: 0.95rem;
+        font-size: 1.15rem;
         font-weight: bold;
         color: #7cab86;
         line-height: 1;
     }
 
     .duolingo-streak-unit {
-        font-size: 0.65rem;
+        font-size: 0.8rem;
         opacity: 0.7;
     }
 
     .duolingo-streak-label {
-        font-size: 0.65rem;
-        opacity: 0.6;
+        font-size: 0.75rem;
+        opacity: 0.65;
         line-height: 1;
     }
 
-    .duolingo-streak-dot {
-        flex-shrink: 0;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--card-text-color-tertiary, #999);
-        transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* 今日已完成：绿色发光圆点 + 火焰轻微跳动 */
-    &[data-status="done"] {
-        .duolingo-streak-dot {
-            background: #7cab86;
-            box-shadow: 0 0 5px rgba(124, 171, 134, 0.6);
-        }
-        .duolingo-streak-flame {
-            animation: duolingoFlameFlicker 2.4s ease-in-out infinite;
-        }
-    }
-
-    /* 今日未完成：橙色提醒圆点 */
-    &[data-status="pending"] .duolingo-streak-dot {
-        background: #e0a458;
-        box-shadow: 0 0 5px rgba(224, 164, 88, 0.5);
-    }
-
-    /* 加载失败：红色圆点 */
-    &[data-status="error"] .duolingo-streak-dot {
-        background: #c05050;
+    /* 今日已完成时火焰轻微跳动 */
+    &[data-status="done"] .duolingo-streak-flame {
+        animation: duolingoFlameFlicker 2.4s ease-in-out infinite;
     }
 }
 
