@@ -834,23 +834,22 @@ html[data-scheme="dark"] .bing-info-card {
 
 /* ================================
    多邻国连胜天数展示
-   —— 无外框，与主菜单项布局对齐
+   —— 无外框，双行紧凑布局，与主菜单对齐
    ================================ */
 .duolingo-streak-widget {
     display: flex;
     align-items: center;
-    gap: var(--menu-icon-separation, 10px);
+    gap: 6px;
     width: 100%;
     margin: 0;
     padding: 0;
     color: var(--body-text-color);
-    font-size: 1.4rem;
-    line-height: 1.5;
+    line-height: 1.15;
 
     .duolingo-streak-flame {
         flex-shrink: 0;
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
         color: #e8702a;
         display: flex;
         align-items: center;
@@ -862,30 +861,49 @@ html[data-scheme="dark"] .bing-info-card {
         }
     }
 
-    .duolingo-streak-label {
+    .duolingo-streak-body {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+    }
+
+    .duolingo-streak-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
     }
 
     .duolingo-streak-count {
         display: inline-flex;
         align-items: baseline;
-        gap: 2px;
+        gap: 1px;
     }
 
     .duolingo-streak-days {
+        font-size: 0.95rem;
         font-weight: bold;
         color: #7cab86;
+        line-height: 1;
     }
 
     .duolingo-streak-unit {
-        font-size: 0.85em;
+        font-size: 0.65rem;
         opacity: 0.7;
+    }
+
+    .duolingo-streak-label {
+        font-size: 0.65rem;
+        opacity: 0.6;
+        line-height: 1;
     }
 
     .duolingo-streak-dot {
         flex-shrink: 0;
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
         background: var(--card-text-color-tertiary, #999);
         transition: background 0.3s ease, box-shadow 0.3s ease;
@@ -895,7 +913,7 @@ html[data-scheme="dark"] .bing-info-card {
     &[data-status="done"] {
         .duolingo-streak-dot {
             background: #7cab86;
-            box-shadow: 0 0 6px rgba(124, 171, 134, 0.6);
+            box-shadow: 0 0 5px rgba(124, 171, 134, 0.6);
         }
         .duolingo-streak-flame {
             animation: duolingoFlameFlicker 2.4s ease-in-out infinite;
@@ -905,7 +923,7 @@ html[data-scheme="dark"] .bing-info-card {
     /* 今日未完成：橙色提醒圆点 */
     &[data-status="pending"] .duolingo-streak-dot {
         background: #e0a458;
-        box-shadow: 0 0 6px rgba(224, 164, 88, 0.5);
+        box-shadow: 0 0 5px rgba(224, 164, 88, 0.5);
     }
 
     /* 加载失败：红色圆点 */
