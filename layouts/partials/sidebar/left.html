@@ -49,27 +49,32 @@
         </ol>
     {{- end -}}
 
-    {{- /* 多邻国连胜天数展示：放在主菜单（快捷跳转链接）上方 */ -}}
-    <a href="https://www.duolingo.com/profile/FROSTYT0216"
-       class="duolingo-streak-widget"
-       id="duolingo-streak"
-       data-status="loading"
-       target="_blank"
-       rel="noopener noreferrer"
-       aria-label="多邻国连胜天数">
+    {{- /* 多邻国连胜天数展示：构建时通过 resources.GetRemote 获取数据（避免浏览器 CORS 限制） */ -}}
+    {{- $streak := "—" -}}
+    {{- $endDate := "" -}}
+    {{- with resources.GetRemote "https://www.duolingo.com/2017-06-30/users?username=FROSTYT0216&fields=streak,streakData%7BcurrentStreak,previousStreak%7D%7D" -}}
+        {{- $data := transform.Unmarshal . -}}
+        {{- with index $data.users 0 -}}
+            {{- $streak = .streak -}}
+            {{- with .streakData -}}
+                {{- with .currentStreak -}}
+                    {{- $endDate = .endDate -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    <div class="duolingo-streak-widget" id="duolingo-streak" data-end-date="{{ $endDate }}" aria-label="多邻国连胜天数">
         <span class="duolingo-streak-flame" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.14-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
             </svg>
         </span>
-        <span class="duolingo-streak-body">
-            <span class="duolingo-streak-number">
-                <span class="duolingo-streak-days" id="duolingo-streak-days">—</span><span class="duolingo-streak-unit">天</span>
-            </span>
-            <span class="duolingo-streak-label">多邻国连胜</span>
+        <span class="duolingo-streak-label">多邻国连胜</span>
+        <span class="duolingo-streak-count">
+            <span class="duolingo-streak-days" id="duolingo-streak-days">{{ $streak }}</span><span class="duolingo-streak-unit">天</span>
         </span>
         <span class="duolingo-streak-dot" aria-hidden="true"></span>
-    </a>
+    </div>
 
     <ol class="menu" id="main-menu">
         {{ $currentPage := . }}
@@ -130,73 +135,17 @@
 </script>
 
 <script>
+// 连胜天数已在构建时通过 Hugo resources.GetRemote 获取并嵌入 HTML；
+// 此处仅根据 endDate 判断今日是否已完成（按访客本地时区）
 (function () {
-    var USERNAME = 'FROSTYT0216';
-    var CACHE_KEY = 'duolingo-streak-cache';
-    var CACHE_TTL = 3600000; // 1 小时内不重复请求
-
-    function getCached() {
-        try {
-            var raw = localStorage.getItem(CACHE_KEY);
-            return raw ? JSON.parse(raw) : null;
-        } catch (e) { return null; }
+    var widget = document.getElementById('duolingo-streak');
+    if (!widget) return;
+    var endDate = widget.getAttribute('data-end-date');
+    if (!endDate) {
+        widget.setAttribute('data-status', 'error');
+        return;
     }
-
-    function setCached(d) {
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch (e) {}
-    }
-
-    function render(d) {
-        var widget = document.getElementById('duolingo-streak');
-        if (!widget) return;
-        if (!d) { widget.setAttribute('data-status', 'error'); return; }
-        var daysEl = widget.querySelector('.duolingo-streak-days');
-        if (daysEl) daysEl.textContent = d.streak;
-        widget.setAttribute('data-status', d.doneToday ? 'done' : 'pending');
-    }
-
-    async function fetchStreak() {
-        var apiUrl = 'https://www.duolingo.com/2017-06-30/users?username=' + USERNAME +
-            '&fields=streak,streakData%7BcurrentStreak,previousStreak%7D%7D';
-        // 多邻国 API 不支持 CORS，依次尝试多个公共代理
-        var proxies = [
-            function (u) { return u; },
-            function (u) { return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
-            function (u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
-            function (u) { return 'https://thingproxy.freeboard.io/fetch/' + u; }
-        ];
-        for (var i = 0; i < proxies.length; i++) {
-            try {
-                var controller = new AbortController();
-                var timer = setTimeout(function () { controller.abort(); }, 6000);
-                var res = await fetch(proxies[i](apiUrl), { signal: controller.signal });
-                clearTimeout(timer);
-                if (!res.ok) continue;
-                var data = await res.json();
-                if (!data || !data.users || !data.users[0]) continue;
-                var u = data.users[0];
-                var streak = Math.max(
-                    u.streak || 0,
-                    (u.streakData && u.streakData.currentStreak && u.streakData.currentStreak.length) || 0,
-                    (u.streakData && u.streakData.previousStreak && u.streakData.previousStreak.length) || 0
-                );
-                var lastDate = u.streakData && u.streakData.currentStreak && u.streakData.currentStreak.endDate;
-                var today = new Date().toISOString().slice(0, 10);
-                return { streak: streak, doneToday: lastDate === today, fetchedAt: Date.now() };
-            } catch (e) { /* 尝试下一个代理 */ }
-        }
-        return null;
-    }
-
-    // 先用缓存即时渲染，再后台刷新
-    var cached = getCached();
-    if (cached) render(cached);
-
-    var stale = !cached || (Date.now() - cached.fetchedAt > CACHE_TTL);
-    if (stale) {
-        fetchStreak().then(function (fresh) {
-            if (fresh) { setCached(fresh); render(fresh); }
-        });
-    }
+    var today = new Date().toISOString().slice(0, 10);
+    widget.setAttribute('data-status', endDate === today ? 'done' : 'pending');
 })();
 </script>

@@ -441,13 +441,13 @@ html[data-scheme="dark"] .bing-wrapper .bing-mask {
 }
 
 /* ================================
-   Bing 壁纸刷新按钮（液态玻璃）
+   Bing 壁纸介绍按钮 + 弹卡片（液态玻璃）
    ================================ */
-.bing-refresh-btn {
+.bing-info-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 9999;
+    z-index: 10000;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -476,14 +476,14 @@ html[data-scheme="dark"] .bing-wrapper .bing-mask {
     overflow: hidden;
     isolation: isolate;
     opacity: 0;
-    animation: bingRefreshFadeIn 0.5s ease 0.8s forwards;
+    animation: bingInfoFadeIn 0.5s ease 0.8s forwards;
 }
 
-@keyframes bingRefreshFadeIn {
+@keyframes bingInfoFadeIn {
     to { opacity: 1; }
 }
 
-.bing-refresh-btn:hover {
+.bing-info-btn:hover {
     background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16);
     transform: translateY(-2px);
     box-shadow:
@@ -492,40 +492,93 @@ html[data-scheme="dark"] .bing-wrapper .bing-mask {
         inset 1px -1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.bing-refresh-btn:active {
+.bing-info-btn:active {
     transform: translateY(0);
 }
 
-.bing-refresh-btn svg {
+.bing-info-btn svg {
     width: 18px;
     height: 18px;
-    transition: transform 0.5s ease;
+    transition: transform 0.3s ease;
 }
 
-/* 悬停时图标轻转，作为可刷新的视觉暗示 */
-.bing-refresh-btn:hover svg {
-    transform: rotate(180deg);
+/* 卡片展开时按钮高亮 */
+.bing-info-btn.active {
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.20);
+    box-shadow:
+        0 6px 16px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.3),
+        inset -1px 1px 2px rgba(255, 255, 255, 0.25),
+        inset 1px -1px 2px rgba(0, 0, 0, 0.06);
 }
 
-/* 加载中：图标持续旋转，按钮不可再点 */
-.bing-refresh-btn.loading {
+.bing-info-btn.active svg {
+    transform: scale(1.15);
+}
+
+/* ---- 介绍弹卡片 ---- */
+.bing-info-card {
+    position: fixed;
+    bottom: 72px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 320px;
+    min-width: 200px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.4);
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.10);
+    background-image:
+        radial-gradient(ellipse 80% 60% at 100% 0%,
+            rgba(255, 255, 255, 0.20) 0%,
+            rgba(255, 255, 255, 0.05) 40%,
+            transparent 70%),
+        radial-gradient(ellipse 70% 50% at 0% 100%,
+            rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.12) 0%,
+            transparent 60%);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow:
+        0 8px 32px rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.25),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset -1px 1px 2px rgba(255, 255, 255, 0.22),
+        inset 1px -1px 2px rgba(0, 0, 0, 0.05);
+    color: var(--sys-color-text, #333);
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
     pointer-events: none;
-    opacity: 0.7;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.bing-refresh-btn.loading svg {
-    animation: bingRefreshSpin 0.8s linear infinite;
-    /* 悬停旋转在 loading 下不再生效 */
-    transform: none;
+.bing-info-card:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
 }
 
-@keyframes bingRefreshSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+.bing-info-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+}
+
+.bing-info-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 1);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.4);
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.bing-info-link:hover {
+    border-bottom-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 1);
+    opacity: 0.85;
 }
 
 /* 适配暗色模式 */
-html[data-scheme="dark"] .bing-refresh-btn {
+html[data-scheme="dark"] .bing-info-btn {
     background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.05);
     color: #eee;
     box-shadow:
@@ -533,8 +586,18 @@ html[data-scheme="dark"] .bing-refresh-btn {
         inset -1px 1px 2px rgba(255, 255, 255, 0.10);
 }
 
-html[data-scheme="dark"] .bing-refresh-btn:hover {
+html[data-scheme="dark"] .bing-info-btn:hover,
+html[data-scheme="dark"] .bing-info-btn.active {
     background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16);
+}
+
+html[data-scheme="dark"] .bing-info-card {
+    background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.06);
+    color: #eee;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset -1px 1px 2px rgba(255, 255, 255, 0.10);
 }
 
 @keyframes fall {
@@ -770,27 +833,24 @@ html[data-scheme="dark"] .bing-refresh-btn:hover {
 }
 
 /* ================================
-   多邻国连胜天数展示卡片
-   —— 液态玻璃风格，匹配左侧边栏主题
+   多邻国连胜天数展示
+   —— 无外框，与主菜单项布局对齐
    ================================ */
 .duolingo-streak-widget {
-    @include liquid-glass($fill-alpha: 0.04, $highlight-alpha: 0.45);
-
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    margin: 0 0 12px 0;
-    border-radius: 14px;
-    text-decoration: none;
+    gap: var(--menu-icon-separation, 10px);
+    width: 100%;
+    margin: 0;
+    padding: 0;
     color: var(--body-text-color);
-    cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    font-size: 1.4rem;
+    line-height: 1.5;
 
     .duolingo-streak-flame {
         flex-shrink: 0;
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         color: #e8702a;
         display: flex;
         align-items: center;
@@ -802,36 +862,24 @@ html[data-scheme="dark"] .bing-refresh-btn:hover {
         }
     }
 
-    .duolingo-streak-body {
+    .duolingo-streak-label {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        min-width: 0;
     }
 
-    .duolingo-streak-number {
-        display: flex;
+    .duolingo-streak-count {
+        display: inline-flex;
         align-items: baseline;
-        gap: 3px;
+        gap: 2px;
     }
 
     .duolingo-streak-days {
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-weight: bold;
         color: #7cab86;
-        line-height: 1;
     }
 
     .duolingo-streak-unit {
-        font-size: 0.75rem;
+        font-size: 0.85em;
         opacity: 0.7;
-    }
-
-    .duolingo-streak-label {
-        font-size: 0.7rem;
-        opacity: 0.6;
-        line-height: 1;
     }
 
     .duolingo-streak-dot {
@@ -863,11 +911,6 @@ html[data-scheme="dark"] .bing-refresh-btn:hover {
     /* 加载失败：红色圆点 */
     &[data-status="error"] .duolingo-streak-dot {
         background: #c05050;
-    }
-
-    &:hover {
-        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16) !important;
-        transform: translateY(-1px);
     }
 }
 

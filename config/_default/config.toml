@@ -12,3 +12,9 @@ hasCJKLanguage = true
 
 [pagination]
     pagerSize = 6
+
+# 远程资源缓存立即过期，确保每次构建都获取最新的多邻国连胜数据
+[caches]
+    [caches.getresource]
+        dir = ':cacheDir/:project'
+        maxAge = '0s'
