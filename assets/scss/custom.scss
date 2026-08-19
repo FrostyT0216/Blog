@@ -768,3 +768,120 @@ html[data-scheme="dark"] .bing-refresh-btn:hover {
         display: none;
     }
 }
+
+/* ================================
+   多邻国连胜天数展示卡片
+   —— 液态玻璃风格，匹配左侧边栏主题
+   ================================ */
+.duolingo-streak-widget {
+    @include liquid-glass($fill-alpha: 0.04, $highlight-alpha: 0.45);
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin: 0 0 12px 0;
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--body-text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+
+    .duolingo-streak-flame {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        color: #e8702a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .duolingo-streak-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .duolingo-streak-number {
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+    }
+
+    .duolingo-streak-days {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #7cab86;
+        line-height: 1;
+    }
+
+    .duolingo-streak-unit {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    .duolingo-streak-label {
+        font-size: 0.7rem;
+        opacity: 0.6;
+        line-height: 1;
+    }
+
+    .duolingo-streak-dot {
+        flex-shrink: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--card-text-color-tertiary, #999);
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* 今日已完成：绿色发光圆点 + 火焰轻微跳动 */
+    &[data-status="done"] {
+        .duolingo-streak-dot {
+            background: #7cab86;
+            box-shadow: 0 0 6px rgba(124, 171, 134, 0.6);
+        }
+        .duolingo-streak-flame {
+            animation: duolingoFlameFlicker 2.4s ease-in-out infinite;
+        }
+    }
+
+    /* 今日未完成：橙色提醒圆点 */
+    &[data-status="pending"] .duolingo-streak-dot {
+        background: #e0a458;
+        box-shadow: 0 0 6px rgba(224, 164, 88, 0.5);
+    }
+
+    /* 加载失败：红色圆点 */
+    &[data-status="error"] .duolingo-streak-dot {
+        background: #c05050;
+    }
+
+    &:hover {
+        background-color: rgba(var(--glass-theme-r), var(--glass-theme-g), var(--glass-theme-b), 0.16) !important;
+        transform: translateY(-1px);
+    }
+}
+
+@keyframes duolingoFlameFlicker {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.88; }
+}
+
+/* 暗色模式适配 */
+html[data-scheme="dark"] .duolingo-streak-widget {
+    .duolingo-streak-flame {
+        color: #f09040;
+    }
+    .duolingo-streak-days {
+        color: #9cc89b;
+    }
+}
